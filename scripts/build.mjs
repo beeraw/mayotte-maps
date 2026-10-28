@@ -120,6 +120,17 @@ function styleByKind(styles) {
   return `-style fill="${pick(0, "none")}" fill-opacity="${pick(1, 1)}" stroke="${pick(2, "none")}" stroke-width=0.6`;
 }
 
+// Buildings by usage: muted tones that stay legible on the land background
+const BUILDING_COLORS = {
+  residential: "#7d5f4b",
+  commercial: "#c4553d",
+  industrial: "#5d6875",
+  agricultural: "#7a8c46",
+  religious: "#2b7a78",
+  sports: "#d19a2a",
+  other: "#a39478",
+};
+
 const RELIEF_COLORS =["#dfe6c6", "#c9d8a6", "#b6c98e", "#c8b98a", "#b39c72", "#9a8060", "#86705a"];
 
 const SIMPLIFY = { detailed: 5, standard: 25, simple: 150 };
@@ -183,16 +194,6 @@ async function administrative() {
   ], "svg-data=code,name,kind,commune");
 }
 
-async function built() {
-  const areas = Object.entries(SERVICE_AREAS).map(([area, color]) => `area == '${area}' ? '${color}'`).join(" : ");
-  await svg("built/services.svg", "island", [
-    `${layer("communes")} -simplify interval=20 keep-shapes ${idField("commune")} -style ${STYLE.division}`,
-    `${layer("services-areas")} -each 'svg_id = "service-area-" + area' -style fill="${areas} : 'none'" stroke=none`,
-    `${layer("services")} -each 'svg_id = "facility-" + slug' ` +
-      `-style fill="${byKind(0, SERVICE_STYLES)} : '#000'" r="${byKind(1, SERVICE_STYLES)} : 2" stroke='#ffffff' stroke-width=0.5`,
-  ], "svg-data=code,name,kind,commune");
-}
-
 async function physical() {
   const relief = RELIEF_COLORS.map((color, index) => `above_m == ${index * 100} ? '${color}'`).join(" : ");
   await svg("physical/relief.svg", "island", [
@@ -252,6 +253,51 @@ async function network() {
   for (const file of ["roads-main", "roads-full", "trails"]) await dropEmptyAttributes(`network/${file}.svg`);
 }
 
+// Rewrites path data as relative moves in hundredths: same shapes, far fewer bytes
+function compactPathData(d) {
+  const number = (value) => (value / 100).toString().replace(/^(-?)0\./, "$1.");
+  // A separator is needed only where the next number could be read as part of the previous one
+  const join = (values) => values.map(number).map((value, index, all) => {
+    const glued = value.startsWith("-") || (value.startsWith(".") && all[index - 1]?.includes("."));
+    return (index && !glued ? " " : "") + value;
+  }).join("");
+  let x = 0;
+  let y = 0;
+  return d.split("Z").filter((ring) => ring.trim()).map((ring) => {
+    const values = ring.replace("M", "").trim().split(/\s+/).map((value) => Math.round(Number(value) * 100));
+    const points = [];
+    for (let i = 0; i < values.length; i += 2) points.push([values[i], values[i + 1]]);
+    const [first, last] = [points[0], points.at(-1)];
+    if (points.length > 1 && first[0] === last[0] && first[1] === last[1]) points.pop();
+    const move = `m${join([first[0] - x, first[1] - y])}`;
+    [x, y] = first;
+    const steps = points.slice(1).map(([px, py], i) => [px - points[i][0], py - points[i][1]]);
+    return `${move}${steps.length ? `l${join(steps.flat())}` : ""}z`;
+  }).join("");
+}
+
+async function compactSvg(file) {
+  const path = `${dist}/svg/${file}`;
+  const text = await readFile(path, "utf8");
+  await writeFile(path, text.replace(/ d="([^"]*)"/g, (_, d) => ` d="${compactPathData(d)}"`));
+}
+
+async function built() {
+  const fill = Object.entries(BUILDING_COLORS).map(([kind, color]) => `kind == '${kind}' ? '${color}'`).join(" : ");
+  await svg("built/buildings.svg", "island", [
+    `${layer("land")} -dissolve -simplify interval=${SIMPLIFY.standard} -style ${STYLE.land}`,
+    `${layer("buildings")} -each 'svg_id = "buildings-" + kind' -style fill="${fill} : '#000'" stroke=none`,
+  ], "svg-data=kind,count,area_ha");
+  await compactSvg("built/buildings.svg");
+  const areas = Object.entries(SERVICE_AREAS).map(([area, color]) => `area == '${area}' ? '${color}'`).join(" : ");
+  await svg("built/services.svg", "island", [
+    `${layer("communes")} -simplify interval=20 keep-shapes ${idField("commune")} -style ${STYLE.division}`,
+    `${layer("services-areas")} -each 'svg_id = "service-area-" + area' -style fill="${areas} : 'none'" stroke=none`,
+    `${layer("services")} -each 'svg_id = "facility-" + slug' ` +
+      `-style fill="${byKind(0, SERVICE_STYLES)} : '#000'" r="${byKind(1, SERVICE_STYLES)} : 2" stroke='#ffffff' stroke-width=0.5`,
+  ], "svg-data=code,name,kind,commune");
+}
+
 async function situation() {
   const regions = {
     "mozambique-channel": { bbox: "30,-27,52,-8", projection: "+proj=laea +lat_0=-17 +lon_0=41", locator: true },
@@ -289,6 +335,10 @@ async function geodata() {
       `${layer(name)} -simplify interval=5 keep-shapes -proj wgs84 -o ${dist}/geojson/mayotte-${name}.geojson precision=0.000001`,
     );
   }
+  // Already generalised in prepare_ign.py: a 5 m simplification would flatten the footprints
+  await mapshaper.runCommands(
+    `${layer("buildings")} -proj wgs84 -o ${dist}/geojson/mayotte-buildings.geojson precision=0.000001`,
+  );
   const inputs = layers.map((name) => `${work}/${name}.geojson`).join(" ");
   await mapshaper.runCommands(
     `-i ${inputs} combine-files -proj init=${CRS} target=* -simplify interval=20 keep-shapes target=* ` +
@@ -306,7 +356,7 @@ const CATALOG_ORDER = {
   administrative: ["communes", "cantons", "epci", "villages", "places"],
   physical: ["relief", "hydrography", "lagoon", "vegetation", "protected-areas"],
   network: ["roads-main", "roads-full", "trails"],
-  built: ["services"],
+  built: ["buildings", "services"],
   situation: ["mozambique-channel", "comoros-archipelago"],
 };
 

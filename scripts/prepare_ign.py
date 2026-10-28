@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import pyogrio
 import rasterio
+import shapely
 from rasterio.merge import merge
 from shapely import force_2d, from_wkb
 from shapely.geometry import mapping
@@ -23,6 +24,21 @@ SRC = ROOT / "data" / "src"
 
 RELIEF_STEP_M = 100
 MIN_RELIEF_M2 = 20000
+
+# Building classes by main usage, mapped from the BD TOPO "usage_1" field
+BUILDING_KINDS = {
+    "Résidentiel": "residential",
+    "Commercial et services": "commercial",
+    "Industriel": "industrial",
+    "Agricole": "agricultural",
+    "Religieux": "religious",
+    "Sportif": "sports",
+    "Annexe": "other",
+    "Indifférencié": "other",
+}
+MIN_BUILDING_M2 = 20
+BUILDING_GAP_M = 2
+BUILDING_TOLERANCE_M = 1.5
 
 
 def slugify(text):
@@ -282,6 +298,24 @@ def nature():
     write("lakes", features)
 
 
+def buildings():
+    """Footprints merged by class: neighbours closer than the gap become one block, sheds are dropped."""
+    rows = read(source("BDTOPO*/**/*.gpkg"), "batiment", ["usage_1"])
+    groups = {}
+    for geom, row in rows:
+        groups.setdefault(BUILDING_KINDS[row["usage_1"]], []).append(shapely.force_2d(geom))
+    features = []
+    for kind in dict.fromkeys(BUILDING_KINDS.values()):
+        footprints = np.array(groups[kind])
+        kept = footprints[shapely.area(footprints) >= MIN_BUILDING_M2]
+        grown = shapely.buffer(kept, BUILDING_GAP_M, join_style="mitre", quad_segs=1)
+        merged = shapely.union_all(grown).buffer(-BUILDING_GAP_M, join_style="mitre")
+        shape = shapely.simplify(merged, BUILDING_TOLERANCE_M)
+        area_ha = round(shapely.area(footprints).sum() / 10000, 1)
+        features.append((shape, {"kind": kind, "count": len(footprints), "area_ha": area_ha}))
+    write("buildings", features)
+
+
 def relief():
     tiles = [rasterio.open(path) for path in glob.glob(str(SRC / "BDALTI*/**/*_MNT_*.asc"), recursive=True)]
     # The tiles carry no CRS: passing nodata to merge() blanks them, their own -99999 is kept instead
@@ -393,6 +427,7 @@ if __name__ == "__main__":
     places()
     services()
     nature()
+    buildings()
     relief()
     roads()
     trails()

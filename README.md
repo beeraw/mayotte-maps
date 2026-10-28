@@ -28,7 +28,8 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 | Réseaux | `dist/svg/network/roads-main.svg` | Routes nationales et départementales, une forme par numéro, et liaisons maritimes (99 Ko) |
 | | `roads-full.svg` | Réseau routier complet : près de 1 300 km de routes, rues, chemins et pistes, avec le nom des rues (798 Ko) |
 | | `trails.svg` | Sentiers et escaliers, routes principales en blanc pour se repérer (705 Ko) |
-| Bâti et équipements | `dist/svg/built/services.svg` | 935 équipements nommés (écoles, santé, services publics, lieux de culte, sport, ports, aéroport…), sur le fond des communes |
+| Bâti et équipements | `dist/svg/built/buildings.svg` | Les 74 096 bâtiments par usage : habitat, commerces et services, industrie, lieux de culte… (1,9 Mo) |
+| | `services.svg` | 935 équipements nommés (écoles, santé, services publics, lieux de culte, sport, ports, aéroport…), sur le fond des communes |
 | Situation | `dist/svg/situation/mozambique-channel.svg` | Mayotte entre l'Afrique et Madagascar |
 | | `comoros-archipelago.svg` | Mayotte dans l'archipel des Comores |
 
@@ -36,8 +37,8 @@ La galerie `index.html` présente toutes les cartes, avec téléchargement et co
 
 Les mêmes couches existent en données géographiques, en WGS84 (longitude, latitude) :
 
-- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `vegetation`, `protected_areas`, `intertidal`, `lakes`, `roads` (routes et liaisons maritimes), `trails` (sentiers et escaliers), `services` ;
-- `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger. Pour rester léger, il garde les routes numérotées et les liaisons maritimes, mais regroupe le reste du réseau et les sentiers par classe, sans le nom des rues : ces noms sont dans les GeoJSON `roads` et `trails`.
+- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `vegetation`, `protected_areas`, `intertidal`, `lakes`, `roads` (routes et liaisons maritimes), `trails` (sentiers et escaliers), `buildings`, `services` ;
+- `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger, sauf `buildings`, trop détaillée pour lui. Pour rester léger, il garde les routes numérotées et les liaisons maritimes, mais regroupe le reste du réseau et les sentiers par classe, sans le nom des rues : ces noms sont dans les GeoJSON `roads` et `trails`.
 
 ## Utiliser les SVG
 
@@ -60,6 +61,7 @@ Chaque forme porte un `id` stable et des attributs `data-*` :
 | Végétation | `vegetation-mangrove` (classe) | `data-kind`, `data-area_ha` |
 | Espaces protégés | `protected-reserve-naturelle-nationale-de-l-ilot-mbouzi` (nom), `protected-n-gouja-biotope-protection` pour un homonyme | `data-name`, `data-kind`, `data-area_ha` |
 | Estran, plans d'eau | `intertidal`, `lake-dziana-dzaha` (nom) | `data-name` (sauf l'estran et une lagune sans nom), `data-kind`, `data-area_ha` |
+| Bâtiments | `buildings-residential` (une forme par usage) | `data-kind`, `data-count`, `data-area_ha` |
 | Situation | `mayotte`, `mayotte-locator`, `country-mdg`… | — |
 
 Les noms sont les noms officiels du Code officiel géographique (par exemple « Bandrele », sans accent).
@@ -82,7 +84,7 @@ Pour que le CSS de la page s'applique, le SVG doit être **intégré dans le HTM
 
 Toutes les cartes de l'île partagent l'un de deux cadres, et se superposent au pixel près :
 
-- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, `vegetation`, `protected-areas`, réseaux, `services` ;
+- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, `vegetation`, `protected-areas`, réseaux, `buildings`, `services` ;
 - **cadre lagon** : `mayotte-lagoon`, `lagoon`.
 
 Exemple : le relief sous les limites de communes, en empilant `relief.svg` puis `communes.svg` avec un remplissage transparent.
@@ -211,6 +213,7 @@ d3.select("svg").selectAll("path")
 - **Relief** : modèle numérique BD ALTI de l'IGN, au pas de 25 m.
 - **Végétation, espaces protégés, estran, plans d'eau** : BD TOPO de l'IGN ; la végétation est fusionnée par classe.
 - **Routes et sentiers** : tronçons de route de la BD TOPO, classés par numéro, nature et importance, assemblés bout à bout et simplifiés à 10 m.
+- **Bâtiments** : emprises de la BD TOPO regroupées par usage principal (`residential`, `commercial`, `industrial`, `agricultural`, `religious`, `sports`, `other`). Les abris de moins de 20 m² sont retirés, les bâtiments distants de moins de 2 m fusionnent en un îlot, le tracé est simplifié à 1,5 m près. `data-count` et `data-area_ha` comptent tous les bâtiments de l'usage.
 
 ### Limites connues
 
@@ -267,6 +270,7 @@ La Licence Ouverte de l'IGN suit ses données partout : nous ne pouvons pas leve
 | `roads-main.svg`, `roads-full.svg` | `roads` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `trails.svg` | `trails`, `roads` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `services.svg` | `services` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
+| `buildings.svg` | `buildings` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 
 `villages.svg`, `places.svg` et `services.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
 

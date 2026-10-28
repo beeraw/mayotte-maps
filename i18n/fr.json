@@ -140,5 +140,16 @@
   "kind.intertidal": "Estran (zone de balancement des marées)",
   "kind.lake": "Lac",
   "kind.reservoir": "Retenue d'eau",
-  "kind.coastal-lagoon": "Lagune"
+  "kind.coastal-lagoon": "Lagune",
+  "map.built.buildings": "Bâtiments",
+  "map.built.buildings.text": "Les 74 096 bâtiments de l'île par usage : habitat, commerces et services, industrie, lieux de culte…",
+  "tip.buildings.count": "{n} bâtiments",
+  "tip.buildings.area": "{area} ha au sol",
+  "kind.residential": "Habitat",
+  "kind.commercial": "Commerces et services",
+  "kind.industrial": "Industrie",
+  "kind.agricultural": "Bâtiments agricoles",
+  "kind.religious": "Lieux de culte",
+  "kind.sports": "Équipements sportifs",
+  "kind.other": "Annexes et bâtiments indifférenciés"
 }

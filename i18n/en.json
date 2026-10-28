@@ -140,5 +140,16 @@
   "kind.intertidal": "Intertidal zone",
   "kind.lake": "Lake",
   "kind.reservoir": "Reservoir",
-  "kind.coastal-lagoon": "Coastal lagoon"
+  "kind.coastal-lagoon": "Coastal lagoon",
+  "map.built.buildings": "Buildings",
+  "map.built.buildings.text": "The island's 74,096 buildings by use: housing, shops and services, industry, places of worship…",
+  "tip.buildings.count": "{n} buildings",
+  "tip.buildings.area": "{area} ha of footprint",
+  "kind.residential": "Housing",
+  "kind.commercial": "Shops and services",
+  "kind.industrial": "Industry",
+  "kind.agricultural": "Farm buildings",
+  "kind.religious": "Places of worship",
+  "kind.sports": "Sports facilities",
+  "kind.other": "Outbuildings and unclassified"
 }

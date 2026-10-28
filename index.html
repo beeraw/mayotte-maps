@@ -428,6 +428,13 @@
       const name = next === undefined ? t("tip.relief.top", { from }) : t("tip.relief.band", { from, to: next });
       return { name, lines: [] };
     }
+    // Building classes: a count and a footprint; other unnamed classes fall through to the area line
+    if (data.name === undefined && data.kind && data.count) {
+      const lines = [];
+      if (data.count) lines.push(t("tip.buildings.count", { n: Number(data.count).toLocaleString(locale) }));
+      if (data.area_ha) lines.push(t("tip.buildings.area", { area: Math.round(Number(data.area_ha)).toLocaleString(locale) }));
+      return { name: t(`kind.${data.kind}`), lines };
+    }
     const lines = [];
     if (data.kind && data.name) lines.push(t(`kind.${data.kind}`));
     if (data.area_ha !== undefined) {
