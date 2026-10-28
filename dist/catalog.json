@@ -78,6 +78,18 @@
     "bytes": 961896
   },
   {
+    "id": "physical.vegetation",
+    "family": "physical",
+    "path": "dist/svg/physical/vegetation.svg",
+    "bytes": 377181
+  },
+  {
+    "id": "physical.protected-areas",
+    "family": "physical",
+    "path": "dist/svg/physical/protected-areas.svg",
+    "bytes": 238489
+  },
+  {
     "id": "network.roads-main",
     "family": "network",
     "path": "dist/svg/network/roads-main.svg",
@@ -94,6 +106,18 @@
     "family": "network",
     "path": "dist/svg/network/trails.svg",
     "bytes": 721508
+  },
+  {
+    "id": "built.buildings",
+    "family": "built",
+    "path": "dist/svg/built/buildings.svg",
+    "bytes": 1941298
+  },
+  {
+    "id": "built.services",
+    "family": "built",
+    "path": "dist/svg/built/services.svg",
+    "bytes": 268477
   },
   {
     "id": "situation.mozambique-channel",

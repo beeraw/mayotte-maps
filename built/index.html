@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title data-i18n="section.meta.title" data-i18n-vars="name:family.built text:family.built.text">Bâti et équipements · Cartes de Mayotte</title>
-<meta name="description" data-i18n-content="section.meta.description" data-i18n-vars="name:family.built text:family.built.text" content="Le bâti de l'île et ses principaux équipements. Cartes vectorielles libres de Mayotte, à télécharger ou à copier en SVG.">
+<meta name="description" data-i18n-content="section.meta.description" data-i18n-vars="name:family.built text:family.built.text" content="Les 74 000 bâtiments de l'île par usage, et 935 équipements : écoles, santé, services publics, ports, aéroport. Cartes vectorielles libres de Mayotte, à télécharger ou à copier en SVG.">
 <link rel="canonical" href="https://beeraw.github.io/mayotte-maps/built/">
 <link rel="icon" href="../dist/svg/silhouette/mayotte-simple.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,9 +30,9 @@
 <nav class="wrap sections" data-i18n-label="page.index" aria-label="Familles de cartes">
   <ul class="chips"><li><a class="chip" href="../silhouette/" data-nav><span data-i18n="family.silhouette">Silhouettes</span><span>5</span></a></li>
     <li><a class="chip" href="../administrative/" data-nav><span data-i18n="family.administrative">Découpages administratifs</span><span>5</span></a></li>
-    <li><a class="chip" href="../physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span>3</span></a></li>
-    <li><a class="chip is-empty" href="../network/" data-nav><span data-i18n="family.network">Réseaux</span><span data-i18n="section.soon">bientôt</span></a></li>
-    <li><a class="chip is-empty" href="../built/" data-nav aria-current="page"><span data-i18n="family.built">Bâti et équipements</span><span data-i18n="section.soon">bientôt</span></a></li>
+    <li><a class="chip" href="../physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span>5</span></a></li>
+    <li><a class="chip" href="../network/" data-nav><span data-i18n="family.network">Réseaux</span><span>3</span></a></li>
+    <li><a class="chip" href="../built/" data-nav aria-current="page"><span data-i18n="family.built">Bâti et équipements</span><span>2</span></a></li>
     <li><a class="chip" href="../situation/" data-nav><span data-i18n="family.situation">Cartes de situation</span><span>2</span></a></li></ul>
 </nav>
 
@@ -40,10 +40,29 @@
   <section class="family" aria-labelledby="section-title">
     <div class="family-head">
       <h1 id="section-title" data-i18n="family.built">Bâti et équipements</h1>
-      <p class="text" data-i18n="family.built.text">Le bâti de l'île et ses principaux équipements.</p>
-      
+      <p class="text" data-i18n="family.built.text">Les 74 000 bâtiments de l'île par usage, et 935 équipements : écoles, santé, services publics, ports, aéroport.</p>
+      <p data-count="2">2 cartes</p>
     </div>
-    <p class="empty" data-i18n="section.empty">Ces cartes sont en préparation.</p>
+    <div class="grid"><article class="card" data-id="built.buildings" data-path="dist/svg/built/buildings.svg" data-bytes="1941298">
+        <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.built.buildings" aria-label="Ouvrir en grand : Bâtiments">
+          <img src="../dist/svg/built/buildings.svg" data-i18n-alt="map.built.buildings" alt="Bâtiments" loading="lazy" decoding="async">
+          <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
+        </button>
+        <h3 data-i18n="map.built.buildings">Bâtiments</h3>
+        <p data-i18n="map.built.buildings.text">Les 74 096 bâtiments de l'île par usage : habitat, commerces et services, industrie, lieux de culte…</p>
+        <div class="file"><span>buildings.svg</span><span data-filesize="1941298">1 896 Ko</span></div>
+        <div class="actions"><a class="btn btn-primary" href="../dist/svg/built/buildings.svg" download data-i18n="action.download">Télécharger</a><button class="btn" type="button" data-copy data-i18n="action.copy">Copier</button></div>
+      </article>
+      <article class="card" data-id="built.services" data-path="dist/svg/built/services.svg" data-bytes="268477">
+        <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.built.services" aria-label="Ouvrir en grand : Équipements et services">
+          <img src="../dist/svg/built/services.svg" data-i18n-alt="map.built.services" alt="Équipements et services" loading="lazy" decoding="async">
+          <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
+        </button>
+        <h3 data-i18n="map.built.services">Équipements et services</h3>
+        <p data-i18n="map.built.services.text">935 équipements nommés : écoles, santé, mairies et services publics, mosquées, sport, places, ports et aéroport.</p>
+        <div class="file"><span>services.svg</span><span data-filesize="268477">262 Ko</span></div>
+        <div class="actions"><a class="btn btn-primary" href="../dist/svg/built/services.svg" download data-i18n="action.download">Télécharger</a><button class="btn" type="button" data-copy data-i18n="action.copy">Copier</button></div>
+      </article></div>
   </section>
 </main>
 

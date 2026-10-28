@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title data-i18n="page.title" data-i18n-vars="">Cartes de Mayotte</title>
-<meta name="description" data-i18n-content="page.lead" data-i18n-vars="" content="Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon et cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.">
+<meta name="description" data-i18n-content="page.lead" data-i18n-vars="" content="Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon, végétation, routes et sentiers, bâtiments et équipements, cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.">
 <link rel="canonical" href="https://beeraw.github.io/mayotte-maps/">
 <link rel="icon" href="dist/svg/silhouette/mayotte-simple.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,12 +30,14 @@
 <header class="wrap hero">
   <div>
     <h1 data-i18n="page.title">Cartes de Mayotte</h1>
-    <p class="lead" data-i18n="page.lead">Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon et cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.</p>
+    <p class="lead" data-i18n="page.lead">Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon, végétation, routes et sentiers, bâtiments et équipements, cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.</p>
     <p class="note" data-i18n="page.licence">Cartes sous CC0 1.0 (domaine public), avec la mention « Source : IGN » pour celles qui reprennent des données IGN (voir en bas de page). Code sous MIT-0.</p>
     <p class="note" data-i18n="page.overlay">Toutes les cartes de l'île d'un même cadre se superposent au pixel près.</p>
     <nav data-i18n-label="page.index" aria-label="Familles de cartes"><ul class="index"><li><a href="silhouette/" data-nav><span data-i18n="family.silhouette">Silhouettes</span><span data-count="5">5 cartes</span></a></li>
       <li><a href="administrative/" data-nav><span data-i18n="family.administrative">Découpages administratifs</span><span data-count="5">5 cartes</span></a></li>
-      <li><a href="physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span data-count="3">3 cartes</span></a></li>
+      <li><a href="physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span data-count="5">5 cartes</span></a></li>
+      <li><a href="network/" data-nav><span data-i18n="family.network">Réseaux</span><span data-count="3">3 cartes</span></a></li>
+      <li><a href="built/" data-nav><span data-i18n="family.built">Bâti et équipements</span><span data-count="2">2 cartes</span></a></li>
       <li><a href="situation/" data-nav><span data-i18n="family.situation">Cartes de situation</span><span data-count="2">2 cartes</span></a></li></ul></nav>
   </div>
   <figure class="hero-map">
@@ -69,8 +71,24 @@
       <a href="physical/" data-nav>
         <span class="tile-preview"><img src="dist/svg/physical/relief.svg" data-i18n-alt="map.physical.relief" alt="Relief" loading="lazy" decoding="async"></span>
         <h3 data-i18n="family.physical">Cartes physiques</h3>
-        <p data-i18n="family.physical.text">Relief, cours d'eau, mangroves, lagon et récifs.</p>
+        <p data-i18n="family.physical.text">Relief, cours d'eau et mangroves, lagon et récifs, végétation et espaces protégés.</p>
+        <span class="count" data-count="5">5 cartes</span>
+      </a>
+    </li>
+    <li class="tile" data-family="network">
+      <a href="network/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/network/roads-main.svg" data-i18n-alt="map.network.roads-main" alt="Routes principales" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.network">Réseaux</h3>
+        <p data-i18n="family.network.text">Routes principales, réseau routier complet et sentiers.</p>
         <span class="count" data-count="3">3 cartes</span>
+      </a>
+    </li>
+    <li class="tile" data-family="built">
+      <a href="built/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/built/buildings.svg" data-i18n-alt="map.built.buildings" alt="Bâtiments" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.built">Bâti et équipements</h3>
+        <p data-i18n="family.built.text">Les 74 000 bâtiments de l'île par usage, et 935 équipements : écoles, santé, services publics, ports, aéroport.</p>
+        <span class="count" data-count="2">2 cartes</span>
       </a>
     </li>
     <li class="tile" data-family="situation">

@@ -30,9 +30,9 @@
 <nav class="wrap sections" data-i18n-label="page.index" aria-label="Familles de cartes">
   <ul class="chips"><li><a class="chip" href="../silhouette/" data-nav><span data-i18n="family.silhouette">Silhouettes</span><span>5</span></a></li>
     <li><a class="chip" href="../administrative/" data-nav><span data-i18n="family.administrative">Découpages administratifs</span><span>5</span></a></li>
-    <li><a class="chip" href="../physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span>3</span></a></li>
-    <li><a class="chip is-empty" href="../network/" data-nav aria-current="page"><span data-i18n="family.network">Réseaux</span><span data-i18n="section.soon">bientôt</span></a></li>
-    <li><a class="chip is-empty" href="../built/" data-nav><span data-i18n="family.built">Bâti et équipements</span><span data-i18n="section.soon">bientôt</span></a></li>
+    <li><a class="chip" href="../physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span>5</span></a></li>
+    <li><a class="chip" href="../network/" data-nav aria-current="page"><span data-i18n="family.network">Réseaux</span><span>3</span></a></li>
+    <li><a class="chip" href="../built/" data-nav><span data-i18n="family.built">Bâti et équipements</span><span>2</span></a></li>
     <li><a class="chip" href="../situation/" data-nav><span data-i18n="family.situation">Cartes de situation</span><span>2</span></a></li></ul>
 </nav>
 
@@ -41,9 +41,38 @@
     <div class="family-head">
       <h1 id="section-title" data-i18n="family.network">Réseaux</h1>
       <p class="text" data-i18n="family.network.text">Routes principales, réseau routier complet et sentiers.</p>
-      
+      <p data-count="3">3 cartes</p>
     </div>
-    <p class="empty" data-i18n="section.empty">Ces cartes sont en préparation.</p>
+    <div class="grid"><article class="card" data-id="network.roads-main" data-path="dist/svg/network/roads-main.svg" data-bytes="101347">
+        <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.network.roads-main" aria-label="Ouvrir en grand : Routes principales">
+          <img src="../dist/svg/network/roads-main.svg" data-i18n-alt="map.network.roads-main" alt="Routes principales" loading="lazy" decoding="async">
+          <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
+        </button>
+        <h3 data-i18n="map.network.roads-main">Routes principales</h3>
+        <p data-i18n="map.network.roads-main.text">Les 4 routes nationales et 26 départementales, une forme par numéro, et les liaisons maritimes.</p>
+        <div class="file"><span>roads-main.svg</span><span data-filesize="101347">99 Ko</span></div>
+        <div class="actions"><a class="btn btn-primary" href="../dist/svg/network/roads-main.svg" download data-i18n="action.download">Télécharger</a><button class="btn" type="button" data-copy data-i18n="action.copy">Copier</button></div>
+      </article>
+      <article class="card" data-id="network.roads-full" data-path="dist/svg/network/roads-full.svg" data-bytes="817305">
+        <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.network.roads-full" aria-label="Ouvrir en grand : Réseau routier complet">
+          <img src="../dist/svg/network/roads-full.svg" data-i18n-alt="map.network.roads-full" alt="Réseau routier complet" loading="lazy" decoding="async">
+          <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
+        </button>
+        <h3 data-i18n="map.network.roads-full">Réseau routier complet</h3>
+        <p data-i18n="map.network.roads-full.text">Près de 1 300 km de routes, rues, chemins et pistes, hiérarchisés par classe, avec le nom des rues.</p>
+        <div class="file"><span>roads-full.svg</span><span data-filesize="817305">798 Ko</span></div>
+        <div class="actions"><a class="btn btn-primary" href="../dist/svg/network/roads-full.svg" download data-i18n="action.download">Télécharger</a><button class="btn" type="button" data-copy data-i18n="action.copy">Copier</button></div>
+      </article>
+      <article class="card" data-id="network.trails" data-path="dist/svg/network/trails.svg" data-bytes="721508">
+        <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.network.trails" aria-label="Ouvrir en grand : Sentiers">
+          <img src="../dist/svg/network/trails.svg" data-i18n-alt="map.network.trails" alt="Sentiers" loading="lazy" decoding="async">
+          <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
+        </button>
+        <h3 data-i18n="map.network.trails">Sentiers</h3>
+        <p data-i18n="map.network.trails.text">880 km de sentiers et 30 km d'escaliers, avec les routes principales en blanc pour se repérer.</p>
+        <div class="file"><span>trails.svg</span><span data-filesize="721508">705 Ko</span></div>
+        <div class="actions"><a class="btn btn-primary" href="../dist/svg/network/trails.svg" download data-i18n="action.download">Télécharger</a><button class="btn" type="button" data-copy data-i18n="action.copy">Copier</button></div>
+      </article></div>
   </section>
 </main>
 

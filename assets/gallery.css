@@ -133,11 +133,18 @@ a { color: inherit; }
 .stage .holder { position: absolute; inset: 0; display: grid; place-items: center; }
 .hero-map .holder { inset: 4% 4%; }
 .map { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; }
-.map [data-name], .map [data-above_m] { cursor: pointer; }
-.map path[data-name], .map path[data-above_m] { transition: fill 120ms ease; }
+.map [data-name], .map [data-ref], .map [data-kind], .map [data-above_m] { cursor: pointer; }
+.map path[data-name], .map path[data-kind], .map path[data-above_m] { transition: fill 120ms ease; }
 .map circle[data-name] { stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; }
 @media (pointer: coarse) { .map circle[data-name] { stroke-width: 24px; } }
-.map .is-hot { fill: var(--ylang); }
+.map .is-hot { fill: var(--ylang); fill-opacity: 1; }
+/* Lines are thin: a wide transparent copy above the map catches the pointer */
+.map .hit { fill: none; stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; pointer-events: stroke; cursor: pointer; }
+@media (pointer: coarse) { .map .hit { stroke-width: 26px; } }
+.map .trace { pointer-events: none; }
+.map .trace path { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.map .trace path:first-child { stroke: #0f2e2c; stroke-width: 6px; }
+.map .trace path:last-child { stroke: var(--ylang); stroke-width: 3.5px; }
 .map .ring { fill: var(--ylang); stroke: #0f2e2c; stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
 
 .tip {

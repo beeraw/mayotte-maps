@@ -5,7 +5,8 @@
 const ROOT = document.body.dataset.root || "";
 const PAGE = document.body.dataset.page;
 const SECTION = document.body.dataset.section;
-const NAMED = "[data-name], [data-above_m]";
+const NAMED = "[data-name], [data-ref], [data-kind], [data-above_m]";
+const SVG_NS = "http://www.w3.org/2000/svg";
 const MAX_ZOOM = 24;
 const coarse = matchMedia("(pointer: coarse)");
 
@@ -48,25 +49,62 @@ function inlineSvg(text, { keepIds = true } = {}) {
   const levels = [...svg.querySelectorAll("[data-above_m]")]
     .map((node) => Number(node.dataset.above_m)).sort((a, b) => a - b);
   if (!keepIds) svg.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
-  return { svg, communes, levels, named: Boolean(svg.querySelector(NAMED)) };
+  const hits = lineHits(svg);
+  return { svg, communes, levels, hits, named: Boolean(svg.querySelector(NAMED)) };
+}
+
+/*
+ * Named lines (roads, sea links, footpaths) get an invisible wide copy in a group drawn
+ * last, so they win over the land underneath; the copies keep the drawing order, so the
+ * strongest roads (drawn last) win where lines cross. Returns copy -> original.
+ */
+function lineHits(svg) {
+  const hits = new WeakMap();
+  const lines = [...svg.querySelectorAll(`path:is(${NAMED})`)]
+    .filter((path) => path.closest("[fill]")?.getAttribute("fill") === "none");
+  if (!lines.length) return hits;
+  const group = document.createElementNS(SVG_NS, "g");
+  group.setAttribute("class", "hits");
+  for (const line of lines) {
+    const hit = document.createElementNS(SVG_NS, "path");
+    hit.setAttribute("class", "hit");
+    hit.setAttribute("d", line.getAttribute("d"));
+    hits.set(hit, line);
+    group.append(hit);
+  }
+  svg.append(group);
+  return hits;
 }
 
 function describe(node, info) {
   const data = node.dataset;
+  if (data.ref) return { name: t(`tip.road.${data.kind}`, { ref: data.ref }), lines: data.name ? [data.name] : [] };
   if (data.above_m !== undefined) {
     const from = Number(data.above_m);
     const next = info.levels.find((level) => level > from);
     const name = next === undefined ? t("tip.relief.top", { from }) : t("tip.relief.band", { from, to: next });
     return { name, lines: [] };
   }
+  // Building classes: a count and a footprint; other unnamed classes fall through to the area line
+  if (data.name === undefined && data.kind && data.count) {
+    const lines = [];
+    if (data.count) lines.push(t("tip.buildings.count", { n: Number(data.count).toLocaleString(locale) }));
+    if (data.area_ha) lines.push(t("tip.buildings.area", { area: Math.round(Number(data.area_ha)).toLocaleString(locale) }));
+    return { name: t(`kind.${data.kind}`), lines };
+  }
   const lines = [];
-  if (data.kind) lines.push(t(`kind.${data.kind}`));
+  if (data.kind && data.name) lines.push(t(`kind.${data.kind}`));
+  if (data.area_ha !== undefined) {
+    const hectares = Number(data.area_ha);
+    lines.push(hectares < 1 ? t("tip.area.small")
+      : t("tip.area", { area: hectares.toLocaleString(locale, { maximumFractionDigits: hectares < 10 ? 1 : 0 }) }));
+  }
   if (data.commune && info.communes.has(data.commune)) lines.push(t("tip.commune", { name: info.communes.get(data.commune) }));
   const prefix = (node.id || "").split("-")[0];
   if (data.code && prefix === "commune") lines.push(t("tip.insee", { code: data.code }));
   if (data.code && prefix === "canton") lines.push(t("tip.canton", { code: data.code }));
   if (data.code && prefix === "epci") lines.push(t("tip.siren", { code: data.code }));
-  return { name: data.name, lines };
+  return { name: data.name || t(`kind.${data.kind}`), lines };
 }
 
 /*
@@ -80,6 +118,7 @@ function createExplorer(stage, holder, { zoomable }) {
   let box = null;
   let hot = null;
   let ring = null;
+  let trace = null;
   const pointers = new Map();
   let start = null;
   let moved = false;
@@ -91,10 +130,14 @@ function createExplorer(stage, holder, { zoomable }) {
     const [x, y, w, h] = info.svg.getAttribute("viewBox").split(/[\s,]+/).map(Number);
     base = { x, y, w, h };
     box = { ...base };
-    ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    ring = document.createElementNS(SVG_NS, "circle");
     ring.setAttribute("class", "ring");
     ring.style.display = "none";
-    info.svg.append(ring);
+    trace = document.createElementNS(SVG_NS, "g");
+    trace.setAttribute("class", "trace");
+    trace.style.display = "none";
+    trace.append(document.createElementNS(SVG_NS, "path"), document.createElementNS(SVG_NS, "path"));
+    info.svg.append(trace, ring);
     update();
   }
 
@@ -156,17 +199,24 @@ function createExplorer(stage, holder, { zoomable }) {
   }
 
   function shapeAt(clientX, clientY) {
-    const node = document.elementFromPoint(clientX, clientY)?.closest?.(NAMED);
-    return node && info && info.svg.contains(node) ? node : null;
+    if (!info) return null;
+    const target = document.elementFromPoint(clientX, clientY);
+    const node = info.hits.get(target) || target?.closest?.(NAMED);
+    return node && info.svg.contains(node) ? node : null;
   }
 
   function highlight(node) {
     if (node === hot) return;
     if (hot) hot.classList.remove("is-hot");
     ring.style.display = "none";
+    trace.style.display = "none";
     hot = node;
     if (!node) return;
-    if (node.tagName === "circle") {
+    if (node.tagName === "path" && node.closest("[fill]")?.getAttribute("fill") === "none") {
+      // A line: draw a highlighted copy on top rather than filling the path
+      trace.querySelectorAll("path").forEach((path) => path.setAttribute("d", node.getAttribute("d")));
+      trace.style.display = "";
+    } else if (node.tagName === "circle") {
       const r = Number(node.getAttribute("r")) || 2;
       ring.setAttribute("cx", node.getAttribute("cx"));
       ring.setAttribute("cy", node.getAttribute("cy"));
