@@ -2,18 +2,33 @@
   "name": "mayotte-maps",
   "version": "0.1.0",
   "description": "Free SVG, GeoJSON and TopoJSON maps of Mayotte: outlines, administrative divisions, relief, lagoon and locator maps.",
-  "keywords": ["mayotte", "map", "svg", "geojson", "topojson", "france", "comoros"],
+  "keywords": [
+    "mayotte",
+    "map",
+    "svg",
+    "geojson",
+    "topojson",
+    "france",
+    "comoros"
+  ],
   "author": "Jean-Luc Petit",
   "license": "(CC0-1.0 AND MIT-0)",
-  "files": ["dist", "LICENSE", "LICENSE-CODE", "README.md"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "LICENSE-CODE",
+    "README.md"
+  ],
   "scripts": {
     "fetch": ".venv/bin/python scripts/fetch_sources.py && .venv/bin/python scripts/fetch_sentinel.py",
     "prepare-data": ".venv/bin/python scripts/derive_sentinel.py && .venv/bin/python scripts/prepare_ign.py",
-    "build": "node scripts/build.mjs && node scripts/pages.mjs",
+    "build": "node scripts/build.mjs && node scripts/share.mjs && node scripts/pages.mjs",
     "pages": "node scripts/pages.mjs",
-    "all": "npm run fetch && npm run prepare-data && npm run build"
+    "all": "npm run fetch && npm run prepare-data && npm run build",
+    "share": "node scripts/share.mjs"
   },
   "devDependencies": {
-    "mapshaper": "^0.7.100"
+    "mapshaper": "^0.7.100",
+    "sharp": "^0.35.5"
   }
 }

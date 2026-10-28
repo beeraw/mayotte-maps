@@ -87,6 +87,8 @@ async function write({ folder, page, section = "", titleKey, descriptionKey, met
     description_key: descriptionKey,
     meta_vars: metaVars,
     canonical: `${site.url}${folder ? `${folder}/` : ""}`,
+    // Link-preview image rendered by scripts/share.mjs
+    share: `${site.url}assets/share/${folder || "home"}.png`,
     root: base,
     home: base || "./",
     page,

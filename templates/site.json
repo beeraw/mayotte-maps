@@ -1,18 +1,33 @@
 {
   "url": "https://beeraw.github.io/mayotte-maps/",
   "hero": "administrative.communes",
+  "share": "silhouette.mayotte-lagoon",
   "sections": [
-    { "id": "silhouette" },
-    { "id": "administrative", "cover": "administrative.villages" },
+    {
+      "id": "silhouette"
+    },
+    {
+      "id": "administrative",
+      "cover": "administrative.villages"
+    },
     {
       "id": "population",
       "cover": "population.population-2017",
       "notice": "https://www.insee.fr/fr/information/9022279",
       "data": "dist/data/mayotte-communes-insee-2017.csv"
     },
-    { "id": "physical" },
-    { "id": "network" },
-    { "id": "built" },
-    { "id": "situation", "cover": "situation.comoros-archipelago" }
+    {
+      "id": "physical"
+    },
+    {
+      "id": "network"
+    },
+    {
+      "id": "built"
+    },
+    {
+      "id": "situation",
+      "cover": "situation.comoros-archipelago"
+    }
   ]
 }

@@ -283,6 +283,8 @@ Les étapes peuvent se lancer séparément : `npm run fetch` (téléchargements)
 
 Les pages de la galerie sont des fichiers HTML statiques générés par `scripts/pages.mjs` (`npm run pages` pour les seules pages) : l'accueil `index.html` et une page par rubrique (`administrative/index.html`…). Le script assemble les gabarits de `templates/`, le catalogue `dist/catalog.json` et les textes de `i18n/fr.json`, écrits en dur dans les pages pour qu'elles se lisent sans JavaScript ; `assets/gallery.js` passe ensuite en anglais avec `?lang=en`. La liste et l'ordre des rubriques, la carte d'accueil et la carte qui illustre chaque rubrique se règlent dans `templates/site.json` ; une rubrique peut aussi y recevoir un avertissement au-dessus des cartes (`notice` : l'adresse du lien, le texte étant la clé `family.<rubrique>.notice`) et un fichier de données à télécharger (`data`). Ne pas modifier les pages générées à la main : elles sont réécrites à chaque construction.
 
+Chaque page a son aperçu de partage (Open Graph et Twitter), avec une image de 1200 × 630 générée par `scripts/share.mjs` (`npm run share`) dans `assets/share/` : la carte qui illustre la rubrique, sur le bleu de la galerie ; pour l'accueil, la carte choisie par `share` dans `templates/site.json`.
+
 ## Sources
 
 - IGN – Admin Express COG, édition 2026 ; BD TOPO, édition du 15 septembre 2026 ; BD ALTI 25 m. Licence Ouverte Etalab 2.0. **Toute réutilisation de ces données doit mentionner l'IGN**, quelle que soit la licence de nos cartes.
