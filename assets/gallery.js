@@ -20,6 +20,9 @@ const countLabel = (n) => t(n === 1 ? "family.count.one" : "family.count.other",
 const sizeLabel = (bytes) =>
   t("unit.kb", { size: (bytes / 1024).toLocaleString(locale, { maximumFractionDigits: bytes < 10240 ? 1 : 0 }) });
 const fileName = (map) => map.path.split("/").pop();
+// Choropleth values: densities as whole numbers, shares with one decimal
+const formatValue = (indicator, value) => Number(value).toLocaleString(locale, indicator === "density"
+  ? { maximumFractionDigits: 0 } : { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 const svgTexts = new Map();
 function fetchSvg(path) {
@@ -50,7 +53,10 @@ function inlineSvg(text, { keepIds = true } = {}) {
     .map((node) => Number(node.dataset.above_m)).sort((a, b) => a - b);
   if (!keepIds) svg.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
   const hits = lineHits(svg);
-  return { svg, communes, levels, hits, named: Boolean(svg.querySelector(NAMED)) };
+  // Choropleths carry their classes on the root element: data-indicator, data-breaks, data-colors
+  const { indicator, breaks, colors } = parsed.dataset;
+  const legend = indicator ? { indicator, breaks: breaks.split(",").map(Number), colors: colors.split(",") } : null;
+  return { svg, communes, levels, hits, legend, named: Boolean(svg.querySelector(NAMED)) };
 }
 
 /*
@@ -101,7 +107,10 @@ function describe(node, info) {
   }
   if (data.commune && info.communes.has(data.commune)) lines.push(t("tip.commune", { name: info.communes.get(data.commune) }));
   const prefix = (node.id || "").split("-")[0];
-  if (data.code && prefix === "commune") lines.push(t("tip.insee", { code: data.code }));
+  if (data.code && prefix === "commune" && !info.legend) lines.push(t("tip.insee", { code: data.code }));
+  if (data.population !== undefined) lines.push(t("tip.population", { n: formatValue("density", data.population) }));
+  const indicator = info.legend?.indicator;
+  if (indicator && data[indicator] !== undefined) lines.push(t(`tip.${indicator}`, { n: formatValue(indicator, data[indicator]) }));
   if (data.code && prefix === "canton") lines.push(t("tip.canton", { code: data.code }));
   if (data.code && prefix === "epci") lines.push(t("tip.siren", { code: data.code }));
   return { name: data.name || t(`kind.${data.kind}`), lines };
@@ -433,9 +442,33 @@ function fillViewerText(map) {
   download.href = map.path;
   download.setAttribute("download", fileName(map));
   document.getElementById("viewer-copy").textContent = t("action.copy");
+  renderLegend(current?.legend);
   const named = viewerHolder.querySelector("svg") && current?.named;
   const mode = coarse.matches ? "touch" : "mouse";
   document.getElementById("viewer-hint").textContent = t(named ? `viewer.hint.${mode}` : `viewer.hint.plain.${mode}`);
+}
+
+/* Legend of a choropleth, from the classes on the SVG root */
+function renderLegend(legend) {
+  const node = document.getElementById("viewer-legend");
+  node.hidden = !legend;
+  if (!legend) { node.replaceChildren(); return; }
+  const { indicator, breaks, colors } = legend;
+  const value = (n) => t(`legend.value.${indicator}`, { n: n.toLocaleString(locale) });
+  const items = colors.map((color, index) => {
+    const label = index === 0 ? t("legend.below", { to: value(breaks[0]) })
+      : index === breaks.length ? t("legend.above", { from: value(breaks[index - 1]) })
+        : t("legend.range", { from: value(breaks[index - 1]), to: value(breaks[index]) });
+    const swatch = Object.assign(document.createElement("span"), { className: "swatch" });
+    swatch.style.background = color;
+    const item = document.createElement("li");
+    item.append(swatch, label);
+    return item;
+  });
+  const title = Object.assign(document.createElement("strong"), { textContent: t(`legend.title.${indicator}`) });
+  const list = document.createElement("ul");
+  list.append(...items.reverse());
+  node.replaceChildren(title, list);
 }
 
 async function openViewer(map, trigger) {
@@ -457,6 +490,7 @@ async function openViewer(map, trigger) {
     info.svg.setAttribute("role", "img");
     info.svg.setAttribute("aria-label", t(`map.${map.id}`));
     current.named = info.named;
+    current.legend = info.legend;
     explorer.load(info);
     fillViewerText(current);
   } catch {

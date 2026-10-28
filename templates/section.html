@@ -8,8 +8,12 @@
       <h1 id="section-title" data-i18n="family.{{id}}"></h1>
       <p class="text" data-i18n="family.{{id}}.text"></p>
       {{count}}
+      {{data}}
     </div>
-    {{content}}
+    <div class="family-body">
+      {{notice}}
+      {{content}}
+    </div>
   </section>
 </main>
 
@@ -33,6 +37,7 @@
   <div class="stage v-stage" id="viewer-stage" tabindex="0" role="group">
     <div class="holder" id="viewer-holder"></div>
     <div class="tip" hidden aria-hidden="true"></div>
+    <div class="legend" id="viewer-legend" hidden></div>
     <div class="zoom">
       <button class="icon-btn" type="button" data-zoom="in" data-i18n-label="action.zoom_in"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg></button>
       <button class="icon-btn" type="button" data-zoom="out" data-i18n-label="action.zoom_out"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10"/></svg></button>

@@ -50,6 +50,17 @@
       </article>
 </template>
 
+<template id="notice">
+<aside class="notice">
+        <p data-i18n="family.{{id}}.notice"></p>
+        <p><a href="{{url}}" data-i18n="family.{{id}}.notice.link"></a></p>
+      </aside>
+</template>
+
+<template id="data">
+<p class="data-file"><a class="btn" href="../{{path}}" download data-i18n="family.{{id}}.data"></a><span>{{file}}</span><span data-filesize="{{bytes}}"></span></p>
+</template>
+
 <template id="credit">
 {{before}}<a href="https://beeraw.yt">{{author}}</a>{{after}}
 </template>

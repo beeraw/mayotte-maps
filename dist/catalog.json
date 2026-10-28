@@ -33,7 +33,7 @@
     "id": "administrative.communes",
     "family": "administrative",
     "path": "dist/svg/administrative/communes.svg",
-    "bytes": 45194
+    "bytes": 45595
   },
   {
     "id": "administrative.cantons",
@@ -58,6 +58,18 @@
     "family": "administrative",
     "path": "dist/svg/administrative/places.svg",
     "bytes": 152949
+  },
+  {
+    "id": "population.population-2017",
+    "family": "population",
+    "path": "dist/svg/population/population-2017.svg",
+    "bytes": 47696
+  },
+  {
+    "id": "population.sheet-metal-housing-2017",
+    "family": "population",
+    "path": "dist/svg/population/sheet-metal-housing-2017.svg",
+    "bytes": 47693
   },
   {
     "id": "physical.relief",

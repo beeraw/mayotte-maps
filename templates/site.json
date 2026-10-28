@@ -4,6 +4,12 @@
   "sections": [
     { "id": "silhouette" },
     { "id": "administrative", "cover": "administrative.villages" },
+    {
+      "id": "population",
+      "cover": "population.population-2017",
+      "notice": "https://www.insee.fr/fr/information/9022279",
+      "data": "dist/data/mayotte-communes-insee-2017.csv"
+    },
     { "id": "physical" },
     { "id": "network" },
     { "id": "built" },

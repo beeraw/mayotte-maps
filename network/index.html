@@ -30,6 +30,7 @@
 <nav class="wrap sections" data-i18n-label="page.index" aria-label="Familles de cartes">
   <ul class="chips"><li><a class="chip" href="../silhouette/" data-nav><span data-i18n="family.silhouette">Silhouettes</span><span>5</span></a></li>
     <li><a class="chip" href="../administrative/" data-nav><span data-i18n="family.administrative">Découpages administratifs</span><span>5</span></a></li>
+    <li><a class="chip" href="../population/" data-nav><span data-i18n="family.population">Population et logement</span><span>2</span></a></li>
     <li><a class="chip" href="../physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span>5</span></a></li>
     <li><a class="chip" href="../network/" data-nav aria-current="page"><span data-i18n="family.network">Réseaux</span><span>3</span></a></li>
     <li><a class="chip" href="../built/" data-nav><span data-i18n="family.built">Bâti et équipements</span><span>2</span></a></li>
@@ -42,8 +43,11 @@
       <h1 id="section-title" data-i18n="family.network">Réseaux</h1>
       <p class="text" data-i18n="family.network.text">Routes principales, réseau routier complet et sentiers.</p>
       <p data-count="3">3 cartes</p>
+      
     </div>
-    <div class="grid"><article class="card" data-id="network.roads-main" data-path="dist/svg/network/roads-main.svg" data-bytes="101347">
+    <div class="family-body">
+      
+      <div class="grid"><article class="card" data-id="network.roads-main" data-path="dist/svg/network/roads-main.svg" data-bytes="101347">
         <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.network.roads-main" aria-label="Ouvrir en grand : Routes principales">
           <img src="../dist/svg/network/roads-main.svg" data-i18n-alt="map.network.roads-main" alt="Routes principales" loading="lazy" decoding="async">
           <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
@@ -73,6 +77,7 @@
         <div class="file"><span>trails.svg</span><span data-filesize="721508">705 Ko</span></div>
         <div class="actions"><a class="btn btn-primary" href="../dist/svg/network/trails.svg" download data-i18n="action.download">Télécharger</a><button class="btn" type="button" data-copy data-i18n="action.copy">Copier</button></div>
       </article></div>
+    </div>
   </section>
 </main>
 
@@ -96,6 +101,7 @@
   <div class="stage v-stage" id="viewer-stage" tabindex="0" role="group">
     <div class="holder" id="viewer-holder"></div>
     <div class="tip" hidden aria-hidden="true"></div>
+    <div class="legend" id="viewer-legend" hidden></div>
     <div class="zoom">
       <button class="icon-btn" type="button" data-zoom="in" data-i18n-label="action.zoom_in" aria-label="Zoomer"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg></button>
       <button class="icon-btn" type="button" data-zoom="out" data-i18n-label="action.zoom_out" aria-label="Dézoomer"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10"/></svg></button>
@@ -110,7 +116,7 @@
 <footer class="wrap">
   <div class="foot">
     <p class="credit" id="credit">Un projet <a href="https://beeraw.yt">beeraw</a></p>
-    <p data-i18n="page.sources">Sources : IGN – Admin Express COG 2026, BD TOPO, BD ALTI (Licence Ouverte 2.0) ; Copernicus Sentinel-2 du 2 septembre 2025 ; Natural Earth. Les silhouettes, le lagon et les cartes de situation sont libres sans condition ; les autres cartes reprennent des données IGN : citez « Source : IGN » en les réutilisant.</p>
+    <p data-i18n="page.sources">Sources : IGN – Admin Express COG 2026, BD TOPO, BD ALTI (Licence Ouverte 2.0) ; Insee, recensement de la population 2017 ; Copernicus Sentinel-2 du 2 septembre 2025 ; Natural Earth. Les silhouettes, le lagon et les cartes de situation sont libres sans condition ; les autres cartes reprennent des données IGN : citez « Source : IGN » en les réutilisant, et « Source : Insee, recensement de la population 2017 » pour les cartes de population.</p>
   </div>
 </footer>
 

@@ -1,8 +1,8 @@
 # Cartes de Mayotte
 
-Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, découpages administratifs, relief, lagon, routes et sentiers, cartes de situation. En SVG pour l'affichage, en GeoJSON et TopoJSON pour les applications cartographiques.
+Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, découpages administratifs, population et logement, relief, lagon, routes et sentiers, cartes de situation. En SVG pour l'affichage, en GeoJSON et TopoJSON pour les applications cartographiques.
 
-**Cartes dans le domaine public (CC0 1.0)** : utilisables partout, y compris dans un projet commercial, sans demander l'autorisation. Les silhouettes, le lagon et les cartes de situation sont libres sans aucune condition. Les autres cartes reprennent des données de l'IGN : en les réutilisant, citez « Source : IGN » (voir [Quelle mention pour quelle carte](#quelle-mention-pour-quelle-carte)).
+**Cartes dans le domaine public (CC0 1.0)** : utilisables partout, y compris dans un projet commercial, sans demander l'autorisation. Les silhouettes, le lagon et les cartes de situation sont libres sans aucune condition. Les autres cartes reprennent des données de l'IGN : en les réutilisant, citez « Source : IGN », et « Source : Insee » en plus pour les cartes de population (voir [Quelle mention pour quelle carte](#quelle-mention-pour-quelle-carte)).
 
 *English summary below.*
 
@@ -20,6 +20,8 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 | | `epci.svg` | Les 5 intercommunalités |
 | | `villages.svg` | 105 villages et lieux-dits habités, sur le fond des communes |
 | | `places.svg` | Tous les lieux nommés (684) : villages, quartiers, lieux-dits, plages, sommets, îlots… |
+| Population et logement | `dist/svg/population/population-2017.svg` | Densité de population par commune, recensement de 2017 |
+| | `sheet-metal-housing-2017.svg` | Part des logements en tôle par commune, recensement de 2017 |
 | Physique | `dist/svg/physical/relief.svg` | Relief en aplats de 100 m |
 | | `hydrography.svg` | Cours d'eau permanents et mangroves |
 | | `lagoon.svg` | Lagon, récifs et hauts-fonds, version détaillée |
@@ -35,9 +37,11 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 
 La galerie `index.html` présente toutes les cartes, avec téléchargement et copie du code.
 
+Les chiffres des cartes de population sont aussi en tableau : `dist/data/mayotte-communes-insee-2017.csv` (voir [Population et logement](#population-et-logement)).
+
 Les mêmes couches existent en données géographiques, en WGS84 (longitude, latitude) :
 
-- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `vegetation`, `protected_areas`, `intertidal`, `lakes`, `roads` (routes et liaisons maritimes), `trails` (sentiers et escaliers), `buildings`, `services` ;
+- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `vegetation`, `protected_areas`, `intertidal`, `lakes`, `roads` (routes et liaisons maritimes), `trails` (sentiers et escaliers), `buildings`, `services`, `population` (les communes avec les chiffres du recensement de 2017, mêmes champs que le CSV) ;
 - `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger, sauf `buildings`, trop détaillée pour lui. Pour rester léger, il garde les routes numérotées et les liaisons maritimes, mais regroupe le reste du réseau et les sentiers par classe, sans le nom des rues : ces noms sont dans les GeoJSON `roads` et `trails`.
 
 ## Utiliser les SVG
@@ -48,7 +52,8 @@ Chaque forme porte un `id` stable et des attributs `data-*` :
 
 | Carte | `id` | Attributs |
 |---|---|---|
-| Communes | `commune-97611` (code INSEE) | `data-code`, `data-name` |
+| Communes | `commune-97611` (code INSEE) | `data-code`, `data-name`, `data-population` (population municipale 2017) |
+| Population et logement | `commune-97611`, comme `communes.svg` | `data-code`, `data-name`, `data-population`, `data-density`, `data-sheet_metal`, `data-no_water`, `data-no_electricity`, `data-household_size` (voir plus bas) |
 | Cantons | `canton-97606` (code INSEE du canton) | `data-code`, `data-name` |
 | Intercommunalités | `epci-200060457` (SIREN) | `data-code`, `data-name` |
 | Villages | `village-97611-kaweni` (commune + nom) | `data-name`, `data-commune` |
@@ -84,7 +89,7 @@ Pour que le CSS de la page s'applique, le SVG doit être **intégré dans le HTM
 
 Toutes les cartes de l'île partagent l'un de deux cadres, et se superposent au pixel près :
 
-- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, `vegetation`, `protected-areas`, réseaux, `buildings`, `services` ;
+- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, population et logement, `relief`, `hydrography`, `vegetation`, `protected-areas`, réseaux, `buildings`, `services` ;
 - **cadre lagon** : `mayotte-lagoon`, `lagoon`.
 
 Exemple : le relief sous les limites de communes, en empilant `relief.svg` puis `communes.svg` avec un remplissage transparent.
@@ -185,6 +190,39 @@ Pour n'afficher que les routes nationales :
 
 Les équipements « en projet » sont écartés, ceux « en construction » sont gardés. Comme pour les lieux nommés, la carte reflète ce que l'IGN a recensé et nommé.
 
+### Population et logement
+
+> **Chiffres de 2017.** Ces chiffres viennent du recensement de 2017 de l'Insee, antérieur au cyclone Chido. Le recensement de 2025-2026 compte 323 153 habitants au 1er janvier 2026 ; ses chiffres par commune seront publiés avec le décret de fin 2026, et ces cartes seront alors mises à jour. Ce total de 2026 est contesté par une partie des élus locaux. Voir [les premiers résultats sur insee.fr](https://www.insee.fr/fr/information/9022279).
+
+Les deux cartes reprennent exactement les formes et les identifiants de `communes.svg` (`commune-97611`…) : elles se superposent au fond des communes. Chaque commune porte tous les indicateurs, quelle que soit la carte :
+
+| Attribut | CSV et GeoJSON | Contenu | Source |
+|---|---|---|---|
+| `data-population` | `population_2017` | population municipale au 1er janvier 2017 (256 518 pour l'île) | Admin Express (Insee) |
+| `data-density` | `density_2017` | habitants par km², surface calculée sur le polygone de la commune (îlots compris) | calcul |
+| — | `dwellings_2017` | nombre de logements | Insee, LOG1 |
+| — | `main_residences_2017` | nombre de résidences principales | Insee, LOG1 |
+| `data-sheet_metal` | `sheet_metal_pct_2017` | part des logements en tôle, en % (35,9 % pour l'île) | Insee, LOG2 |
+| `data-no_water` | `no_water_inside_pct_2017` | part des résidences principales sans eau à l'intérieur du logement, en % (29,1 %) | Insee, PRINC8 |
+| `data-no_electricity` | `no_electricity_pct_2017` | part des résidences principales sans électricité, en % (10,0 %) | Insee, PRINC10 |
+| `data-household_size` | `household_size_2017` | nombre moyen de personnes par résidence principale | Insee, PRINC4 |
+
+Précisions sur les catégories de l'Insee :
+
+- **Logements en tôle** : catégorie « Maison en tôle » du tableau « aspect du bâti » (LOG2), rapportée à l'ensemble des logements de la commune (résidences principales, secondaires, occasionnelles et logements vacants). Les deux autres catégories sont « Maison en bois, végétal ou terre » et « Maison ou immeuble en dur ». Le tableau ne détaille pas l'aspect du bâti pour les seules résidences principales.
+- **Sans eau à l'intérieur** : les cinq modalités « À l'extérieur du logement » du tableau « approvisionnement en eau » (PRINC8) : dans la cour, chez un parent, chez un tiers, borne fontaine, autre (puits, citerne, rivière, ruisseau).
+- **Sans électricité** : modalité « Absence d'électricité » du tableau PRINC10.
+- Les tableaux de l'Insee portent sur l'exploitation principale du recensement : leurs effectifs sont pondérés, d'où des valeurs non entières, arrondies dans le CSV.
+
+Les classes des deux cartes sont arrondies et placées dans les écarts entre les valeurs des communes. Elles sont écrites sur l'élément racine du SVG, puisque la carte ne contient aucun texte : `data-indicator` (l'attribut colorié), `data-breaks` (les seuils) et `data-colors` (une couleur par classe, une de plus que de seuils). Une classe va d'un seuil, inclus, au suivant. La galerie construit la légende à partir de ces attributs.
+
+| Carte | Seuils | Communes par classe |
+|---|---|---|
+| `population-2017.svg` | moins de 400, 400 à 1 000, 1 000 à 1 500, 1 500 à 2 500, 2 500 et plus hab./km² | 4, 7, 3, 1, 2 |
+| `sheet-metal-housing-2017.svg` | moins de 20, 20 à 30, 30 à 40, 40 à 45, 45 % et plus | 7, 1, 3, 4, 2 |
+
+`dist/data/mayotte-communes-insee-2017.csv` donne une ligne par commune, en UTF-8, séparateur virgule, point décimal : `code_insee`, `name` (nom officiel du COG), puis les champs du tableau ci-dessus.
+
 ### Aucun texte dans les cartes
 
 Les SVG ne contiennent aucune étiquette : chacun ajoute les siennes, dans sa langue et sa police. Les noms sont dans les attributs `data-name`, et les centres des villages sont donnés par les cercles de `villages.svg`.
@@ -213,6 +251,7 @@ d3.select("svg").selectAll("path")
 - **Relief** : modèle numérique BD ALTI de l'IGN, au pas de 25 m.
 - **Végétation, espaces protégés, estran, plans d'eau** : BD TOPO de l'IGN ; la végétation est fusionnée par classe.
 - **Routes et sentiers** : tronçons de route de la BD TOPO, classés par numéro, nature et importance, assemblés bout à bout et simplifiés à 10 m.
+- **Population et logement** : population municipale 2017 de l'Admin Express (champ `population`, recensement Insee) ; indicateurs de logement tirés des tableaux détaillés de l'Insee par commune, joints sur le code INSEE, avec contrôle des noms. Les tableaux ne donnent pas la population : en contrôle, la population des ménages qu'ils impliquent (taille moyenne × résidences principales) fait 255 547 personnes, pour 256 518 habitants, l'écart correspondant aux personnes hors ménages ordinaires.
 - **Bâtiments** : emprises de la BD TOPO regroupées par usage principal (`residential`, `commercial`, `industrial`, `agricultural`, `religious`, `sports`, `other`). Les abris de moins de 20 m² sont retirés, les bâtiments distants de moins de 2 m fusionnent en un îlot, le tracé est simplifié à 1,5 m près. `data-count` et `data-area_ha` comptent tous les bâtiments de l'usage.
 
 ### Limites connues
@@ -226,7 +265,7 @@ d3.select("svg").selectAll("path")
 
 ## Reconstruire les cartes
 
-Il faut Python 3 et Node.js. Environ 190 Mo de données sont téléchargés, sans compte.
+Il faut Python 3 et Node.js. Environ 190 Mo de données sont téléchargés, sans compte, dont deux classeurs de l'Insee (130 Ko), convertis en CSV dans `data/src/insee/`.
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
@@ -242,13 +281,15 @@ npm run all
 
 Les étapes peuvent se lancer séparément : `npm run fetch` (téléchargements), `npm run prepare-data` (tracés et extraction), `npm run build` (SVG, GeoJSON, TopoJSON, catalogue de la galerie, puis pages de la galerie).
 
-Les pages de la galerie sont des fichiers HTML statiques générés par `scripts/pages.mjs` (`npm run pages` pour les seules pages) : l'accueil `index.html` et une page par rubrique (`administrative/index.html`…). Le script assemble les gabarits de `templates/`, le catalogue `dist/catalog.json` et les textes de `i18n/fr.json`, écrits en dur dans les pages pour qu'elles se lisent sans JavaScript ; `assets/gallery.js` passe ensuite en anglais avec `?lang=en`. La liste et l'ordre des rubriques, la carte d'accueil et la carte qui illustre chaque rubrique se règlent dans `templates/site.json`. Ne pas modifier les pages générées à la main : elles sont réécrites à chaque construction.
+Les pages de la galerie sont des fichiers HTML statiques générés par `scripts/pages.mjs` (`npm run pages` pour les seules pages) : l'accueil `index.html` et une page par rubrique (`administrative/index.html`…). Le script assemble les gabarits de `templates/`, le catalogue `dist/catalog.json` et les textes de `i18n/fr.json`, écrits en dur dans les pages pour qu'elles se lisent sans JavaScript ; `assets/gallery.js` passe ensuite en anglais avec `?lang=en`. La liste et l'ordre des rubriques, la carte d'accueil et la carte qui illustre chaque rubrique se règlent dans `templates/site.json` ; une rubrique peut aussi y recevoir un avertissement au-dessus des cartes (`notice` : l'adresse du lien, le texte étant la clé `family.<rubrique>.notice`) et un fichier de données à télécharger (`data`). Ne pas modifier les pages générées à la main : elles sont réécrites à chaque construction.
 
 ## Sources
 
 - IGN – Admin Express COG, édition 2026 ; BD TOPO, édition du 15 septembre 2026 ; BD ALTI 25 m. Licence Ouverte Etalab 2.0. **Toute réutilisation de ces données doit mentionner l'IGN**, quelle que soit la licence de nos cartes.
 - Contient des données Copernicus Sentinel-2 modifiées (2025), via AWS Open Data.
 - Natural Earth (domaine public), pour les pays voisins des cartes de situation.
+- Insee, recensement de la population de Mayotte 2017, [tableaux détaillés](https://www.insee.fr/fr/statistiques/4199326) publiés le 5 août 2019 (logements LOG1 à LOG3, résidences principales PRINC1 à PRINC20, par commune). Mention : « Source : Insee, recensement de la population 2017 ».
+- Insee, [premiers résultats du recensement de 2025-2026](https://www.insee.fr/fr/information/9022279) et [présentation de ce recensement](https://www.insee.fr/fr/information/8671839), pour l'avertissement des cartes de population.
 
 ## Licences
 
@@ -273,6 +314,7 @@ La Licence Ouverte de l'IGN suit ses données partout : nous ne pouvons pas leve
 | `trails.svg` | `trails`, `roads` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `services.svg` | `services` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `buildings.svg` | `buildings` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
+| `population-2017.svg`, `sheet-metal-housing-2017.svg`, CSV | `population` | Insee (recensement 2017) et IGN – Admin Express (formes des communes) | « Source : Insee, recensement de la population 2017 ; IGN – Admin Express » (le CSV seul : « Source : Insee, recensement de la population 2017 ») |
 
 `villages.svg`, `places.svg` et `services.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
 
@@ -284,4 +326,6 @@ Auteur : Jean-Luc Petit.
 
 ## English summary
 
-Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, vegetation cover, protected natural areas, lagoon and reefs, road network and footpaths, facilities and services, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, facilities, rivers, mangroves, vegetation, protected areas, roads, footpaths and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.
+Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), population and housing by commune, relief, rivers and mangroves, vegetation cover, protected natural areas, lagoon and reefs, road network and footpaths, facilities and services, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, facilities, rivers, mangroves, vegetation, protected areas, roads, footpaths and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.
+
+Population and housing: population density and the share of sheet-metal dwellings by commune (`dist/svg/population/`), with every indicator as `data-*` attributes, the class breaks on the SVG root (`data-indicator`, `data-breaks`, `data-colors`), a `population` GeoJSON/TopoJSON layer and a CSV (`dist/data/mayotte-communes-insee-2017.csv`). Credit “Source: Insee, 2017 population census; IGN – Admin Express”. **These figures come from INSEE's 2017 census, taken before cyclone Chido.** The 2025–2026 census counts 323,153 inhabitants on 1 January 2026; its figures by commune will be published with the decree at the end of 2026, and these maps will be updated then. Some local elected officials contest the 2026 total ([INSEE, in French](https://www.insee.fr/fr/information/9022279)).

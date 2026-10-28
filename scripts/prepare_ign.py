@@ -3,6 +3,7 @@
 Coordinates stay in RGM04 / UTM 38S (EPSG:4471), like the sources.
 """
 
+import csv
 import glob
 import re
 import unicodedata
@@ -421,6 +422,69 @@ def trails():
     write("trails", [(geom, complete(props)) for geom, props in features])
 
 
+def insee_table(workbook, sheet):
+    """One INSEE table by commune: {code: (name, {column label: count})}, the count being the "Effectif" column."""
+    with open(SRC / "insee" / workbook / f"{sheet}.csv", encoding="utf-8") as file:
+        rows = [[" ".join(cell.replace("’", "'").split()) for cell in row] for row in csv.reader(file)]
+    units = next((index for index, row in enumerate(rows) if "Effectif" in row), None)
+    labels = rows[units - 1] if units else rows[2]
+    table = {}
+    for row in rows:
+        if re.fullmatch(r"976\d\d(\.0)?", row[0]):
+            values = {label: float(row[column]) for column, label in enumerate(labels) if column >= 2 and label}
+            table[row[0][:5]] = (row[1], values)
+    return table
+
+
+def population():
+    """Communes with their 2017 population (Admin Express) and housing indicators (INSEE, census 2017)."""
+    communes = {row["code_insee"]: (geom, row) for geom, row in read(
+        source("ADMIN-EXPRESS-COG*/**/*.gpkg"), "commune",
+        ["code_insee", "nom_officiel", "population", "date_du_recensement"])}
+    dwellings = insee_table("rp-mayotte-2017-communes-log", "LOG1")
+    building = insee_table("rp-mayotte-2017-communes-log", "LOG2")
+    household = insee_table("rp-mayotte-2017-communes-princ", "PRINC4")
+    water = insee_table("rp-mayotte-2017-communes-princ", "PRINC8")
+    electricity = insee_table("rp-mayotte-2017-communes-princ", "PRINC10")
+    for table in (dwellings, building, household, water, electricity):
+        if set(table) != set(communes):
+            raise SystemExit(f"INSEE communes do not match Admin Express: {sorted(set(table) ^ set(communes))}")
+        for code, (name, _) in table.items():
+            if slugify(name) != slugify(communes[code][1]["nom_officiel"]):
+                raise SystemExit(f"INSEE name {name!r} does not match {communes[code][1]['nom_officiel']!r} for {code}")
+
+    def share(part, whole):
+        return round(100 * part / whole, 1)
+
+    features = []
+    for code in sorted(communes):
+        geom, row = communes[code]
+        if str(row["date_du_recensement"])[:4] != "2017":
+            raise SystemExit(f"unexpected census date for {code}: {row['date_du_recensement']}")
+        log, princ = dwellings[code][1], electricity[code][1]
+        outside = [count for label, count in water[code][1].items() if label.startswith("A l'extérieur du logement")]
+        if len(outside) != 5 or princ["Ensemble"] != log["Résidence principale"]:
+            raise SystemExit(f"unexpected INSEE table layout for {code}")
+        features.append((geom, {
+            "code": code,
+            "name": row["nom_officiel"],
+            "population_2017": int(row["population"]),
+            "density_2017": round(int(row["population"]) / (geom.area / 1e6)),
+            "dwellings_2017": round(log["Ensemble"]),
+            "main_residences_2017": round(log["Résidence principale"]),
+            # LOG2 "Maison en tôle": share of all dwellings, vacant and secondary ones included
+            "sheet_metal_pct_2017": share(building[code][1]["Maison en tôle"], building[code][1]["Ensemble"]),
+            "no_water_inside_pct_2017": share(sum(outside), water[code][1]["Ensemble"]),
+            "no_electricity_pct_2017": share(princ["Absence d'électricité"], princ["Ensemble"]),
+            "household_size_2017": round(household[code][1]["Nombre moyen de personnes par logement"], 2),
+        }))
+    total = sum(props["population_2017"] for _, props in features)
+    in_households = sum(household[c][1]["Nombre moyen de personnes par logement"] * dwellings[c][1]["Résidence principale"]
+                        for c in communes)
+    print(f"population 2017: {total} (Admin Express), {in_households:.0f} in households (INSEE tables)")
+    write("population", features)
+
+
 if __name__ == "__main__":
     administrative()
     topography()
@@ -431,3 +495,4 @@ if __name__ == "__main__":
     relief()
     roads()
     trails()
+    population()

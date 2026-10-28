@@ -1,7 +1,7 @@
 // Generate the gallery pages (home and one page per section) from templates/, dist/catalog.json
 // and the French strings. The browser script switches them to English (?lang=en).
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -65,12 +65,14 @@ function localize(html) {
   });
 }
 
-const sections = site.sections.map(({ id, cover }) => {
+const sections = await Promise.all(site.sections.map(async ({ id, cover, notice, data }) => {
   const maps = catalog.filter((entry) => entry.family === id);
   const chosen = maps.find((entry) => entry.id === cover);
   if (cover && !chosen) console.warn(`templates/site.json: cover ${cover} not in the catalog, using the first map of ${id}`);
-  return { id, maps, cover: chosen ?? maps[0] };
-});
+  // Optional: a notice above the cards (text family.<id>.notice, link to `notice`) and a data file to download
+  const file = data && { path: data, bytes: (await stat(`${root}${data}`)).size };
+  return { id, maps, cover: chosen ?? maps[0], notice, file };
+}));
 for (const family of new Set(catalog.map((entry) => entry.family))) {
   if (!sections.some((section) => section.id === family)) console.warn(`family ${family} is in the catalog but not in templates/site.json: no page`);
 }
@@ -115,7 +117,7 @@ await write({
   }),
 });
 
-for (const { id, maps } of sections) {
+for (const { id, maps, notice, file } of sections) {
   const chips = sections.map((other) => fragment("chip", {
     id: other.id,
     href: `../${other.id}/`,
@@ -137,6 +139,8 @@ for (const { id, maps } of sections) {
       id,
       chips,
       count: maps.length ? fragment("count", { n: maps.length }) : "",
+      notice: notice ? fragment("notice", { id, url: escape(notice) }) : "",
+      data: file ? fragment("data", { id, path: file.path, bytes: file.bytes, file: escape(file.path.split("/").pop()) }) : "",
       content: maps.length ? fragment("grid", { cards }) : fragment("empty"),
     }),
   });

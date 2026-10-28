@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title data-i18n="page.title" data-i18n-vars="">Cartes de Mayotte</title>
-<meta name="description" data-i18n-content="page.lead" data-i18n-vars="" content="Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon, végétation, routes et sentiers, bâtiments et équipements, cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.">
+<meta name="description" data-i18n-content="page.lead" data-i18n-vars="" content="Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, population et logement, relief, lagon, végétation, routes et sentiers, bâtiments et équipements, cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.">
 <link rel="canonical" href="https://beeraw.github.io/mayotte-maps/">
 <link rel="icon" href="dist/svg/silhouette/mayotte-simple.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,11 +30,12 @@
 <header class="wrap hero">
   <div>
     <h1 data-i18n="page.title">Cartes de Mayotte</h1>
-    <p class="lead" data-i18n="page.lead">Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon, végétation, routes et sentiers, bâtiments et équipements, cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.</p>
-    <p class="note" data-i18n="page.licence">Cartes sous CC0 1.0 (domaine public), avec la mention « Source : IGN » pour celles qui reprennent des données IGN (voir en bas de page). Code sous MIT-0.</p>
+    <p class="lead" data-i18n="page.lead">Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, population et logement, relief, lagon, végétation, routes et sentiers, bâtiments et équipements, cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.</p>
+    <p class="note" data-i18n="page.licence">Cartes sous CC0 1.0 (domaine public), avec la mention « Source : IGN » pour celles qui reprennent des données IGN, et « Source : Insee » en plus pour les cartes de population (voir en bas de page). Code sous MIT-0.</p>
     <p class="note" data-i18n="page.overlay">Toutes les cartes de l'île d'un même cadre se superposent au pixel près.</p>
     <nav data-i18n-label="page.index" aria-label="Familles de cartes"><ul class="index"><li><a href="silhouette/" data-nav><span data-i18n="family.silhouette">Silhouettes</span><span data-count="5">5 cartes</span></a></li>
       <li><a href="administrative/" data-nav><span data-i18n="family.administrative">Découpages administratifs</span><span data-count="5">5 cartes</span></a></li>
+      <li><a href="population/" data-nav><span data-i18n="family.population">Population et logement</span><span data-count="2">2 cartes</span></a></li>
       <li><a href="physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span data-count="5">5 cartes</span></a></li>
       <li><a href="network/" data-nav><span data-i18n="family.network">Réseaux</span><span data-count="3">3 cartes</span></a></li>
       <li><a href="built/" data-nav><span data-i18n="family.built">Bâti et équipements</span><span data-count="2">2 cartes</span></a></li>
@@ -65,6 +66,14 @@
         <h3 data-i18n="family.administrative">Découpages administratifs</h3>
         <p data-i18n="family.administrative.text">Communes, cantons, intercommunalités, villages et lieux nommés, avec leurs codes officiels.</p>
         <span class="count" data-count="5">5 cartes</span>
+      </a>
+    </li>
+    <li class="tile" data-family="population">
+      <a href="population/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/population/population-2017.svg" data-i18n-alt="map.population.population-2017" alt="Densité de population 2017" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.population">Population et logement</h3>
+        <p data-i18n="family.population.text">Population, densité et habitat en tôle des 17 communes, au recensement de 2017.</p>
+        <span class="count" data-count="2">2 cartes</span>
       </a>
     </li>
     <li class="tile" data-family="physical">
@@ -105,7 +114,7 @@
 <footer class="wrap">
   <div class="foot">
     <p class="credit" id="credit">Un projet <a href="https://beeraw.yt">beeraw</a></p>
-    <p data-i18n="page.sources">Sources : IGN – Admin Express COG 2026, BD TOPO, BD ALTI (Licence Ouverte 2.0) ; Copernicus Sentinel-2 du 2 septembre 2025 ; Natural Earth. Les silhouettes, le lagon et les cartes de situation sont libres sans condition ; les autres cartes reprennent des données IGN : citez « Source : IGN » en les réutilisant.</p>
+    <p data-i18n="page.sources">Sources : IGN – Admin Express COG 2026, BD TOPO, BD ALTI (Licence Ouverte 2.0) ; Insee, recensement de la population 2017 ; Copernicus Sentinel-2 du 2 septembre 2025 ; Natural Earth. Les silhouettes, le lagon et les cartes de situation sont libres sans condition ; les autres cartes reprennent des données IGN : citez « Source : IGN » en les réutilisant, et « Source : Insee, recensement de la population 2017 » pour les cartes de population.</p>
   </div>
 </footer>
 

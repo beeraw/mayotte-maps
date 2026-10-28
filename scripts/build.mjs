@@ -135,6 +135,19 @@ const RELIEF_COLORS =["#dfe6c6", "#c9d8a6", "#b6c98e", "#c8b98a", "#b39c72", "#9
 
 const SIMPLIFY = { detailed: 5, standard: 25, simple: 150 };
 
+// Census 2017 by commune: class breaks (a class runs from one break, included, to the next) and colours
+const CHOROPLETHS = {
+  "population-2017": { indicator: "density", breaks: [400, 1000, 1500, 2500], colors: ["#ece4cf", "#c5d4b4", "#8fbaa0", "#4f8f84", "#1f5f5b"] },
+  "sheet-metal-housing-2017": { indicator: "sheet_metal", breaks: [20, 30, 40, 45], colors: ["#ece4cf", "#e0c3a3", "#c99a78", "#a8694f", "#73402f"] },
+};
+// Field of data/work/population.geojson -> data-* attribute of the SVG
+const POPULATION_FIELDS = {
+  population_2017: "population", density_2017: "density", sheet_metal_pct_2017: "sheet_metal",
+  no_water_inside_pct_2017: "no_water", no_electricity_pct_2017: "no_electricity", household_size_2017: "household_size",
+};
+const CSV_FIELDS = ["code", "name", "population_2017", "density_2017", "dwellings_2017", "main_residences_2017",
+  "sheet_metal_pct_2017", "no_water_inside_pct_2017", "no_electricity_pct_2017", "household_size_2017"];
+
 function layer(name, options = "") {
   return `-i ${work}/${name}.geojson name=${name} -proj init=${CRS} ${options}`;
 }
@@ -176,8 +189,9 @@ async function silhouettes() {
 async function administrative() {
   const data = "svg-data=code,name";
   await svg("administrative/communes.svg", "island", [
-    `${layer("communes")} -simplify interval=20 keep-shapes ${idField("commune")} -style ${STYLE.division}`,
-  ], data);
+    `${layer("communes")} -simplify interval=20 keep-shapes ${idField("commune")} -style ${STYLE.division} ` +
+      `-join ${work}/population.geojson keys=code,code fields=population_2017 -rename-fields population=population_2017`,
+  ], `${data},population`);
   await svg("administrative/cantons.svg", "island", [
     `${layer("cantons")} -simplify interval=20 keep-shapes ${idField("canton")} -style ${STYLE.division}`,
   ], data);
@@ -222,6 +236,28 @@ async function physical() {
     `${layer("lakes")} -simplify interval=5 -each 'svg_id = "lake-" + slug, name = name || ""' ${styleByKind(PROTECTED_STYLES)}`,
     `${layer("protected_areas")} -simplify interval=10 keep-shapes -each 'svg_id = "protected-" + slug' ${styleByKind(PROTECTED_STYLES)}`,
   ], "svg-data=name,kind,area_ha");
+}
+
+async function population() {
+  const rename = Object.entries(POPULATION_FIELDS).map(([field, name]) => `${name}=${field}`).join(",");
+  for (const [file, { indicator, breaks, colors }] of Object.entries(CHOROPLETHS)) {
+    const field = Object.keys(POPULATION_FIELDS).find((key) => POPULATION_FIELDS[key] === indicator);
+    const fill = breaks.map((value, index) => `${field} < ${value} ? '${colors[index]}'`).join(" : ") + ` : '${colors.at(-1)}'`;
+    await svg(`population/${file}.svg`, "island", [
+      `${layer("population")} -simplify interval=20 keep-shapes ${idField("commune")} -style fill="${fill}" stroke='#ffffff' stroke-width=0.8 ` +
+        `-rename-fields ${rename}`,
+    ], `svg-data=code,name,${Object.values(POPULATION_FIELDS).join(",")}`);
+    // The legend is not drawn (no text in the maps): the classes ride on the root element
+    const path = `${dist}/svg/population/${file}.svg`;
+    const text = await readFile(path, "utf8");
+    await writeFile(path, text.replace("<svg ", `<svg data-indicator="${indicator}" data-breaks="${breaks.join(",")}" data-colors="${colors.join(",")}" `));
+  }
+  const { features } = JSON.parse(await readFile(`${work}/population.geojson`, "utf8"));
+  const cell = (value) => (/[",\n]/.test(String(value)) ? `"${String(value).replace(/"/g, '""')}"` : String(value));
+  const rows = features.map(({ properties }) => CSV_FIELDS.map((field) => cell(properties[field])).join(","));
+  const header = ["code_insee", ...CSV_FIELDS.slice(1)].join(",");
+  await writeFile(`${dist}/data/mayotte-communes-insee-2017.csv`, [header, ...rows].join("\n") + "\n");
+  console.log("data/mayotte-communes-insee-2017.csv");
 }
 
 // mapshaper writes missing values as the string "null": drop those attributes
@@ -329,7 +365,7 @@ async function situation() {
 
 async function geodata() {
   const layers = ["land", "lagoon", "reef", "communes", "cantons", "epci", "villages", "places", "rivers", "mangroves", "relief", "roads", "trails", "services",
-    "vegetation", "protected_areas", "intertidal", "lakes"];
+    "vegetation", "protected_areas", "intertidal", "lakes", "population"];
   for (const name of layers) {
     await mapshaper.runCommands(
       `${layer(name)} -simplify interval=5 keep-shapes -proj wgs84 -o ${dist}/geojson/mayotte-${name}.geojson precision=0.000001`,
@@ -354,6 +390,7 @@ async function geodata() {
 const CATALOG_ORDER = {
   silhouette: ["mayotte", "mayotte-detailed", "mayotte-simple", "mayotte-outline", "mayotte-lagoon"],
   administrative: ["communes", "cantons", "epci", "villages", "places"],
+  population: ["population-2017", "sheet-metal-housing-2017"],
   physical: ["relief", "hydrography", "lagoon", "vegetation", "protected-areas"],
   network: ["roads-main", "roads-full", "trails"],
   built: ["buildings", "services"],
@@ -374,11 +411,12 @@ async function catalog() {
 }
 
 await rm(dist, { recursive: true, force: true });
-for (const folder of ["svg/silhouette", "svg/administrative", "svg/physical", "svg/network", "svg/built", "svg/situation", "geojson", "topojson"]) {
+for (const folder of ["svg/silhouette", "svg/administrative", "svg/physical", "svg/network", "svg/built", "svg/situation", "svg/population", "data", "geojson", "topojson"]) {
   await mkdir(`${dist}/${folder}`, { recursive: true });
 }
 await silhouettes();
 await administrative();
+await population();
 await physical();
 await network();
 await built();
