@@ -468,7 +468,29 @@ if (viewer) {
   document.getElementById("viewer-close").addEventListener("click", () => viewer.close());
   document.getElementById("viewer-copy").addEventListener("click", (event) => { if (current) copySvg(current, event.currentTarget); });
   viewer.addEventListener("click", (event) => { if (event.target === viewer) viewer.close(); });
+  // Full screen on the map itself; iPhone Safari offers it for videos only, so the button stays hidden there
+  const stageNode = document.getElementById("viewer-stage");
+  const fullscreenButton = stageNode.querySelector("[data-fullscreen]");
+  const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+  const exitFullscreen = () => (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+  if (stageNode.requestFullscreen || stageNode.webkitRequestFullscreen) {
+    fullscreenButton.hidden = false;
+    fullscreenButton.addEventListener("click", () => {
+      if (fullscreenElement()) exitFullscreen();
+      else (stageNode.requestFullscreen || stageNode.webkitRequestFullscreen).call(stageNode);
+    });
+    const syncFullscreen = () => {
+      const on = fullscreenElement() === stageNode;
+      stageNode.classList.toggle("is-fullscreen", on);
+      const label = t(on ? "action.fullscreen_exit" : "action.fullscreen");
+      fullscreenButton.setAttribute("aria-label", label);
+      fullscreenButton.title = label;
+    };
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    document.addEventListener("webkitfullscreenchange", syncFullscreen);
+  }
   viewer.addEventListener("close", () => {
+    if (fullscreenElement()) exitFullscreen();
     explorer.clear();
     viewerHolder.replaceChildren();
     current = null;

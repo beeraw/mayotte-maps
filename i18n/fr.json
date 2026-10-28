@@ -161,5 +161,7 @@
   "section.meta.title": "{name} · Cartes de Mayotte",
   "section.meta.description": "{text} Cartes vectorielles libres de Mayotte, à télécharger ou à copier en SVG.",
   "section.soon": "bientôt",
-  "section.empty": "Ces cartes sont en préparation."
+  "section.empty": "Ces cartes sont en préparation.",
+  "action.fullscreen": "Plein écran",
+  "action.fullscreen_exit": "Quitter le plein écran"
 }

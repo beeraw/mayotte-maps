@@ -161,5 +161,7 @@
   "section.meta.title": "{name} · Maps of Mayotte",
   "section.meta.description": "{text} Free vector maps of Mayotte to download or copy as SVG.",
   "section.soon": "soon",
-  "section.empty": "These maps are in preparation."
+  "section.empty": "These maps are in preparation.",
+  "action.fullscreen": "Full screen",
+  "action.fullscreen_exit": "Exit full screen"
 }
