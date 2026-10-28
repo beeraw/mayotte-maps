@@ -23,6 +23,7 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 | Physique | `dist/svg/physical/relief.svg` | Relief en aplats de 100 m |
 | | `hydrography.svg` | Cours d'eau permanents et mangroves |
 | | `lagoon.svg` | Lagon, récifs et hauts-fonds, version détaillée |
+| Bâti et équipements | `dist/svg/built/buildings.svg` | Les 74 096 bâtiments par usage : habitat, commerces et services, industrie, lieux de culte… (1,9 Mo) |
 | Situation | `dist/svg/situation/mozambique-channel.svg` | Mayotte entre l'Afrique et Madagascar |
 | | `comoros-archipelago.svg` | Mayotte dans l'archipel des Comores |
 
@@ -30,8 +31,8 @@ La galerie `index.html` présente toutes les cartes, avec téléchargement et co
 
 Les mêmes couches existent en données géographiques, en WGS84 (longitude, latitude) :
 
-- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief` ;
-- `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger.
+- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `buildings` ;
+- `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger, sauf `buildings`, trop détaillée pour lui.
 
 ## Utiliser les SVG
 
@@ -47,6 +48,7 @@ Chaque forme porte un `id` stable et des attributs `data-*` :
 | Villages | `village-97611-kaweni` (commune + nom) | `data-name`, `data-commune` |
 | Lieux nommés | `place-97611-kaweni`, `place-97611-hamaha-summit` pour un homonyme | `data-name`, `data-kind`, `data-commune` |
 | Relief | `relief-300` (altitude du niveau) | `data-above_m` |
+| Bâtiments | `buildings-residential` (une forme par usage) | `data-kind`, `data-count`, `data-area_ha` |
 | Situation | `mayotte`, `mayotte-locator`, `country-mdg`… | — |
 
 Les noms sont les noms officiels du Code officiel géographique (par exemple « Bandrele », sans accent).
@@ -69,7 +71,7 @@ Pour que le CSS de la page s'applique, le SVG doit être **intégré dans le HTM
 
 Toutes les cartes de l'île partagent l'un de deux cadres, et se superposent au pixel près :
 
-- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography` ;
+- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, `buildings` ;
 - **cadre lagon** : `mayotte-lagoon`, `lagoon`.
 
 Exemple : le relief sous les limites de communes, en empilant `relief.svg` puis `communes.svg` avec un remplissage transparent.
@@ -123,6 +125,7 @@ d3.select("svg").selectAll("path")
   - lagon : enveloppe convexe du système récifal, ramenée à 2,5 km au plus de tout récif ou de toute terre, puis lissée.
 - **Communes, cantons, intercommunalités, villages, cours d'eau, mangroves** : données IGN, simplifiées sans trou ni chevauchement entre voisins.
 - **Relief** : modèle numérique BD ALTI de l'IGN, au pas de 25 m.
+- **Bâtiments** : emprises de la BD TOPO regroupées par usage principal (`residential`, `commercial`, `industrial`, `agricultural`, `religious`, `sports`, `other`). Les abris de moins de 20 m² sont retirés, les bâtiments distants de moins de 2 m fusionnent en un îlot, le tracé est simplifié à 1,5 m près. `data-count` et `data-area_ha` comptent tous les bâtiments de l'usage.
 
 ### Limites connues
 
@@ -172,6 +175,7 @@ La Licence Ouverte de l'IGN suit ses données partout : nous ne pouvons pas leve
 | `villages.svg`, `places.svg` | `villages`, `places` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `hydrography.svg` | `rivers`, `mangroves` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `relief.svg` | `relief` | IGN – BD ALTI | « Source : IGN – BD ALTI » |
+| `buildings.svg` | `buildings` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 
 `villages.svg` et `places.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
 
