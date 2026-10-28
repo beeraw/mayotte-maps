@@ -4,283 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Cartes de Mayotte</title>
+<title data-i18n="page.title" data-i18n-vars="">Cartes de Mayotte</title>
+<meta name="description" data-i18n-content="page.lead" data-i18n-vars="" content="Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon et cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.">
+<link rel="canonical" href="https://beeraw.github.io/mayotte-maps/">
 <link rel="icon" href="dist/svg/silhouette/mayotte-simple.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap">
-<style>
-  /* Tokens. The map surface (--sea) stays light in both themes: the SVGs carry light
-     presentation fills (sand land, pale lagoon) and are meant to be read on a pale sea. */
-  :root {
-    --paper: #f3f6f5;
-    --surface: #ffffff;
-    --ink: #0f2e2c;
-    --muted: #4b6361;
-    --line: #d3dedc;
-    --lagoon: #1b6863;
-    --lagoon-ink: #ffffff;
-    --sea: #bcd8da;
-    --sea-line: #a7c9cc;
-    --ylang: #e9b949;
-    --tip-bg: #0f2e2c;
-    --tip-ink: #f3f6f5;
-    --tip-muted: #a9c3c0;
-    --focus: #1b6863;
-    --serif: "Spectral", Georgia, "Times New Roman", serif;
-    --sans: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #0b1c1e;
-      --surface: #11272a;
-      --ink: #e2ecea;
-      --muted: #97b0ad;
-      --line: #22403f;
-      --lagoon: #7ccfc4;
-      --lagoon-ink: #06201e;
-      --sea: #a9cbce;
-      --sea-line: #2c4c4d;
-      --tip-bg: #f3f6f5;
-      --tip-ink: #0f2e2c;
-      --tip-muted: #4b6361;
-      --focus: #7ccfc4;
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --paper: #0b1c1e;
-    --surface: #11272a;
-    --ink: #e2ecea;
-    --muted: #97b0ad;
-    --line: #22403f;
-    --lagoon: #7ccfc4;
-    --lagoon-ink: #06201e;
-    --sea: #a9cbce;
-    --sea-line: #2c4c4d;
-    --tip-bg: #f3f6f5;
-    --tip-ink: #0f2e2c;
-    --tip-muted: #4b6361;
-    --focus: #7ccfc4;
-    color-scheme: dark;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font: 400 16px/1.55 var(--sans);
-    font-feature-settings: "kern", "liga";
-  }
-  body:has(dialog[open]) { overflow: hidden; }
-  a { color: inherit; }
-  :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
-  .visually-hidden {
-    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
-    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-  }
-  .wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 16px; }
-  @media (min-width: 720px) { .wrap { padding: 0 32px; } }
-
-  /* Top bar */
-  .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; padding-bottom: 20px; }
-  .brand { display: inline-flex; align-items: center; gap: 10px; font: italic 500 1.15rem/1 var(--serif); letter-spacing: 0.01em; text-decoration: none; }
-  .brand .glyph {
-    width: 22px; height: 29px; flex: none; background: var(--lagoon);
-    -webkit-mask: url("dist/svg/silhouette/mayotte-simple.svg") center / contain no-repeat;
-    mask: url("dist/svg/silhouette/mayotte-simple.svg") center / contain no-repeat;
-  }
-
-  /* Language switch: a two-option segmented control */
-  .lang { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
-  .lang button {
-    appearance: none; border: 0; background: transparent; color: var(--muted);
-    font: 600 0.8rem/1 var(--sans); letter-spacing: 0.04em;
-    min-width: 44px; padding: 8px 12px; border-radius: 999px; cursor: pointer;
-  }
-  .lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); cursor: default; }
-  .lang button:not([aria-pressed="true"]):hover { color: var(--ink); }
-
-  /* Link to the source repository, same height as the language switch */
-  .top-actions { display: inline-flex; align-items: center; gap: 10px; }
-  .repo {
-    display: inline-flex; align-items: center; justify-content: center; flex: none;
-    width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 999px;
-    background: var(--surface); color: var(--ink); transition: background 0.15s, color 0.15s;
-  }
-  .repo svg { width: 20px; height: 20px; }
-  .repo:hover { background: var(--ink); color: var(--paper); }
-
-  /* Hero: the communes map itself, live */
-  .hero { display: grid; gap: 32px; padding-top: 16px; padding-bottom: 56px; align-items: center; }
-  @media (min-width: 900px) { .hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 64px; padding-top: 32px; padding-bottom: 88px; } }
-  .hero h1 {
-    font: 400 clamp(2.6rem, 7.2vw, 5.4rem)/0.98 var(--serif);
-    letter-spacing: -0.025em; margin: 0 0 28px; text-wrap: balance;
-  }
-  .lead { font-size: clamp(1.05rem, 1.6vw, 1.22rem); line-height: 1.55; max-width: 34em; margin: 0 0 20px; }
-  .note { color: var(--muted); font-size: 0.92rem; max-width: 40em; margin: 0 0 10px; }
-  .index { list-style: none; margin: 32px 0 0; padding: 0; border-top: 1px solid var(--line); max-width: 34em; }
-  .index li { border-bottom: 1px solid var(--line); }
-  .index a {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
-    padding: 12px 2px; text-decoration: none;
-  }
-  .index a span:first-child { font: italic 400 1.2rem/1.3 var(--serif); }
-  .index a span:last-child { color: var(--muted); font-size: 0.86rem; font-variant-numeric: tabular-nums; }
-  .index a:hover span:first-child { color: var(--lagoon); }
-
-  .hero-map { margin: 0; }
-  .hero-map .stage { aspect-ratio: 1000 / 1180; max-height: 78vh; margin-inline: auto; }
-  .hero-map figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 12px; text-align: center; }
-
-  /* Map surfaces shared by hero, cards and viewer */
-  .stage {
-    position: relative; overflow: hidden; background: var(--sea);
-    border-radius: 18px; border: 1px solid var(--sea-line);
-  }
-  .stage .holder { position: absolute; inset: 0; display: grid; place-items: center; }
-  .hero-map .holder { inset: 4% 4%; }
-  .map { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; }
-  .map [data-name], .map [data-above_m] { cursor: pointer; }
-  .map path[data-name], .map path[data-above_m] { transition: fill 120ms ease; }
-  .map circle[data-name] { stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; }
-  @media (pointer: coarse) { .map circle[data-name] { stroke-width: 24px; } }
-  .map .is-hot { fill: var(--ylang); }
-  .map .ring { fill: var(--ylang); stroke: #0f2e2c; stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
-
-  .tip {
-    position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none;
-    max-width: min(260px, calc(100% - 16px));
-    background: var(--tip-bg); color: var(--tip-ink);
-    padding: 8px 12px 9px; border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(6, 30, 30, 0.22);
-    font-size: 0.82rem; line-height: 1.35;
-  }
-  .tip[hidden] { display: none; }
-  .tip strong { display: block; font: 500 1.02rem/1.25 var(--serif); }
-  .tip span { display: block; color: var(--tip-muted); }
-
-  /* Families */
-  .family { border-top: 1px solid var(--line); padding: 40px 0 56px; scroll-margin-top: 16px; }
-  @media (min-width: 900px) {
-    .family { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; padding: 56px 0 72px; }
-    .family-head { position: sticky; top: 24px; align-self: start; }
-  }
-  .family h2 { font: italic 400 clamp(1.7rem, 3vw, 2.2rem)/1.1 var(--serif); letter-spacing: -0.01em; margin: 0 0 6px; }
-  .family-head p { color: var(--muted); margin: 0 0 24px; font-size: 0.9rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 228px), 1fr)); gap: 40px 28px; }
-
-  .card { display: flex; flex-direction: column; min-width: 0; }
-  .preview {
-    appearance: none; display: block; width: 100%; padding: 0; margin: 0 0 16px; cursor: zoom-in;
-    border: 1px solid var(--sea-line); border-radius: 14px; background: var(--sea);
-    aspect-ratio: 4 / 5; overflow: hidden; position: relative;
-  }
-  .preview img { position: absolute; inset: 7%; width: 86%; height: 86%; object-fit: contain; transition: transform 300ms cubic-bezier(.2,.7,.2,1); }
-  .preview:hover img { transform: scale(1.035); }
-  .preview .lens {
-    position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px; border-radius: 50%;
-    display: grid; place-items: center; background: rgba(255,255,255,0.86); color: #0f2e2c;
-    opacity: 0; transition: opacity 160ms ease;
-  }
-  .preview:hover .lens, .preview:focus-visible .lens { opacity: 1; }
-  @media (hover: none) { .preview .lens { opacity: 1; } }
-  .card h3 { font: 500 1.18rem/1.25 var(--serif); margin: 0 0 6px; }
-  .card p { color: var(--muted); font-size: 0.9rem; margin: 0 0 12px; flex: 1; }
-  .file { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; overflow-wrap: anywhere; }
-  .file span:first-child { color: var(--ink); }
-  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  @media (max-width: 559px) {
-    .grid { gap: 28px; }
-    .card { display: grid; grid-template-columns: 38% minmax(0, 1fr); column-gap: 16px; align-items: start; }
-    .card > .preview { grid-row: 1 / span 5; margin: 0; }
-    .card h3 { font-size: 1.08rem; }
-    .card p { margin-bottom: 8px; }
-    .file { margin-bottom: 10px; }
-    .btn { min-height: 36px; padding: 7px 12px; font-size: 0.82rem; }
-  }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    min-height: 38px; padding: 8px 14px; border-radius: 999px; cursor: pointer;
-    font: 500 0.86rem/1 var(--sans); text-decoration: none; white-space: nowrap;
-    border: 1px solid var(--line); background: transparent; color: var(--ink);
-  }
-  .btn:hover { border-color: var(--muted); }
-  .btn-primary { background: var(--lagoon); border-color: var(--lagoon); color: var(--lagoon-ink); }
-  .btn-primary:hover { filter: brightness(1.08); border-color: var(--lagoon); }
-  .btn svg { width: 15px; height: 15px; flex: none; }
-
-  /* Footer */
-  footer { padding-bottom: 48px; color: var(--muted); font-size: 0.86rem; }
-  .foot { border-top: 1px solid var(--line); padding-top: 32px; display: grid; gap: 8px; }
-  @media (min-width: 900px) { .foot { grid-template-columns: 220px minmax(0, 1fr); gap: 48px; } }
-  footer p { margin: 0 0 10px; max-width: 72em; }
-  .credit { font: italic 400 1.05rem/1.4 var(--serif); color: var(--ink); }
-  .credit a { text-decoration-color: var(--lagoon); text-underline-offset: 3px; }
-  .credit a:hover { color: var(--lagoon); }
-
-  /* Viewer */
-  dialog.viewer {
-    padding: 0; border: 0; color: var(--ink); background: var(--surface);
-    width: min(1180px, calc(100vw - 48px)); height: min(920px, calc(100dvh - 48px));
-    max-width: none; max-height: none; border-radius: 20px; overflow: hidden;
-    box-shadow: 0 24px 80px rgba(4, 24, 26, 0.35);
-  }
-  dialog.viewer::backdrop { background: rgba(8, 30, 32, 0.62); backdrop-filter: blur(3px); }
-  dialog.viewer[open] { display: flex; flex-direction: column; animation: rise 220ms cubic-bezier(.2,.7,.2,1); }
-  @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(0.985); } }
-  .v-bar { display: flex; align-items: flex-start; gap: 16px; padding: 18px 18px 14px 24px; }
-  .v-titles { flex: 1; min-width: 0; }
-  .v-titles h2 { font: 400 1.6rem/1.15 var(--serif); margin: 0 0 4px; }
-  .v-titles p { margin: 0; color: var(--muted); font-size: 0.9rem; }
-  .v-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-  .icon-btn {
-    appearance: none; width: 40px; height: 40px; flex: none; display: grid; place-items: center;
-    border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer;
-  }
-  .icon-btn:hover { border-color: var(--muted); }
-  .icon-btn:disabled { opacity: 0.4; cursor: default; }
-  .icon-btn svg { width: 18px; height: 18px; }
-  .v-stage { flex: 1; margin: 0 18px; border-radius: 14px; touch-action: none; cursor: grab; }
-  .v-stage.is-dragging { cursor: grabbing; }
-  .v-stage .holder { inset: 12px; }
-  .v-stage .status { color: #0f2e2c; font-size: 0.95rem; padding: 24px; text-align: center; max-width: 30em; }
-  .zoom { position: absolute; right: 12px; bottom: 12px; z-index: 2; display: flex; flex-direction: column; gap: 6px; }
-  .zoom .icon-btn { background: #ffffff; color: #0f2e2c; border-color: rgba(15, 46, 44, 0.18); }
-  .zoom .icon-btn:focus-visible { outline-color: #0f2e2c; }
-  .v-hint { margin: 0; padding: 12px 24px 16px; color: var(--muted); font-size: 0.84rem; }
-
-  @media (max-width: 640px) {
-    dialog.viewer { width: 100vw; height: 100dvh; border-radius: 0; }
-    .v-bar { flex-wrap: wrap; padding: 14px 16px 12px; gap: 10px 12px; }
-    .v-titles { flex-basis: calc(100% - 56px); }
-    .v-titles h2 { font-size: 1.3rem; }
-    .v-actions { order: 3; flex-basis: 100%; justify-content: flex-start; }
-    .v-close { order: 2; }
-    .v-stage { margin: 0 8px; }
-    .v-stage .holder { inset: 6px; }
-    .v-hint { padding: 10px 16px 14px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { transition: none !important; animation: none !important; }
-  }
-</style>
+<link rel="stylesheet" href="assets/gallery.css">
 </head>
-<body>
+<body data-page="home" data-section="" data-root="">
 <div class="wrap top">
-  <a class="brand" href="#top" id="top"><span class="glyph" aria-hidden="true"></span><span data-i18n="page.brand"></span></a>
+  <a class="brand" href="./" data-nav><span class="glyph" aria-hidden="true"></span><span data-i18n="page.brand">Mayotte</span></a>
   <div class="top-actions">
-    <div class="lang" role="group" data-i18n-label="page.language">
-      <button type="button" data-lang="fr" lang="fr"><span aria-hidden="true" data-i18n="lang.fr"></span><span class="visually-hidden" data-i18n="lang.fr.name"></span></button>
-      <button type="button" data-lang="en" lang="en"><span aria-hidden="true" data-i18n="lang.en"></span><span class="visually-hidden" data-i18n="lang.en.name"></span></button>
+    <div class="lang" role="group" data-i18n-label="page.language" aria-label="Langue">
+      <button type="button" data-lang="fr" lang="fr" aria-pressed="true"><span aria-hidden="true" data-i18n="lang.fr">FR</span><span class="visually-hidden" data-i18n="lang.fr.name">Français</span></button>
+      <button type="button" data-lang="en" lang="en" aria-pressed="false"><span aria-hidden="true" data-i18n="lang.en">EN</span><span class="visually-hidden" data-i18n="lang.en.name">English</span></button>
     </div>
-    <a class="repo" href="https://github.com/beeraw/mayotte-maps" data-i18n-label="page.repository" data-i18n-title="page.repository">
+    <a class="repo" href="https://github.com/beeraw/mayotte-maps" data-i18n-label="page.repository" data-i18n-title="page.repository" aria-label="Voir le code sur GitHub" title="Voir le code sur GitHub">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
     </a>
   </div>
@@ -288,564 +29,68 @@
 
 <header class="wrap hero">
   <div>
-    <h1 data-i18n="page.title"></h1>
-    <p class="lead" data-i18n="page.lead"></p>
-    <p class="note" data-i18n="page.licence"></p>
-    <p class="note" data-i18n="page.overlay"></p>
-    <nav data-i18n-label="page.index"><ul class="index" id="index"></ul></nav>
+    <h1 data-i18n="page.title">Cartes de Mayotte</h1>
+    <p class="lead" data-i18n="page.lead">Cartes vectorielles libres de Mayotte : silhouettes, découpages administratifs, relief, lagon et cartes de situation. À utiliser dans tous vos projets, même commerciaux, sans demander l'autorisation.</p>
+    <p class="note" data-i18n="page.licence">Cartes sous CC0 1.0 (domaine public), avec la mention « Source : IGN » pour celles qui reprennent des données IGN (voir en bas de page). Code sous MIT-0.</p>
+    <p class="note" data-i18n="page.overlay">Toutes les cartes de l'île d'un même cadre se superposent au pixel près.</p>
+    <nav data-i18n-label="page.index" aria-label="Familles de cartes"><ul class="index"><li><a href="silhouette/" data-nav><span data-i18n="family.silhouette">Silhouettes</span><span data-count="5">5 cartes</span></a></li>
+      <li><a href="administrative/" data-nav><span data-i18n="family.administrative">Découpages administratifs</span><span data-count="5">5 cartes</span></a></li>
+      <li><a href="physical/" data-nav><span data-i18n="family.physical">Cartes physiques</span><span data-count="3">3 cartes</span></a></li>
+      <li><a href="situation/" data-nav><span data-i18n="family.situation">Cartes de situation</span><span data-count="2">2 cartes</span></a></li></ul></nav>
   </div>
   <figure class="hero-map">
-    <div class="stage" id="hero-stage">
+    <div class="stage" id="hero-stage" data-id="administrative.communes" data-path="dist/svg/administrative/communes.svg">
       <div class="holder" id="hero-holder"></div>
       <div class="tip" hidden aria-hidden="true"></div>
     </div>
-    <figcaption id="hero-hint"></figcaption>
+    <figcaption id="hero-hint" data-i18n="page.hero.hint.mouse">Survolez une commune pour lire son nom.</figcaption>
   </figure>
 </header>
 
-<main class="wrap" id="families"></main>
+<main class="wrap tiles" aria-labelledby="tiles-title">
+  <h2 class="visually-hidden" id="tiles-title" data-i18n="page.index">Familles de cartes</h2>
+  <ul class="tile-grid"><li class="tile" data-family="silhouette">
+      <a href="silhouette/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/silhouette/mayotte.svg" data-i18n-alt="map.silhouette.mayotte" alt="Silhouette" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.silhouette">Silhouettes</h3>
+        <p data-i18n="family.silhouette.text">La forme de l'île, du tracé détaillé à l'icône, avec ou sans le lagon.</p>
+        <span class="count" data-count="5">5 cartes</span>
+      </a>
+    </li>
+    <li class="tile" data-family="administrative">
+      <a href="administrative/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/administrative/villages.svg" data-i18n-alt="map.administrative.villages" alt="Villages" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.administrative">Découpages administratifs</h3>
+        <p data-i18n="family.administrative.text">Communes, cantons, intercommunalités, villages et lieux nommés, avec leurs codes officiels.</p>
+        <span class="count" data-count="5">5 cartes</span>
+      </a>
+    </li>
+    <li class="tile" data-family="physical">
+      <a href="physical/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/physical/relief.svg" data-i18n-alt="map.physical.relief" alt="Relief" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.physical">Cartes physiques</h3>
+        <p data-i18n="family.physical.text">Relief, cours d'eau, mangroves, lagon et récifs.</p>
+        <span class="count" data-count="3">3 cartes</span>
+      </a>
+    </li>
+    <li class="tile" data-family="situation">
+      <a href="situation/" data-nav>
+        <span class="tile-preview"><img src="dist/svg/situation/comoros-archipelago.svg" data-i18n-alt="map.situation.comoros-archipelago" alt="Archipel des Comores" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.situation">Cartes de situation</h3>
+        <p data-i18n="family.situation.text">Mayotte dans l'archipel des Comores et dans le canal du Mozambique.</p>
+        <span class="count" data-count="2">2 cartes</span>
+      </a>
+    </li></ul>
+</main>
+
 
 <footer class="wrap">
   <div class="foot">
-    <p class="credit" id="credit"></p>
-    <p data-i18n="page.sources"></p>
+    <p class="credit" id="credit">Un projet <a href="https://beeraw.yt">beeraw</a></p>
+    <p data-i18n="page.sources">Sources : IGN – Admin Express COG 2026, BD TOPO, BD ALTI (Licence Ouverte 2.0) ; Copernicus Sentinel-2 du 2 septembre 2025 ; Natural Earth. Les silhouettes, le lagon et les cartes de situation sont libres sans condition ; les autres cartes reprennent des données IGN : citez « Source : IGN » en les réutilisant.</p>
   </div>
 </footer>
 
-<dialog class="viewer" id="viewer" aria-labelledby="viewer-title" aria-describedby="viewer-text">
-  <div class="v-bar">
-    <div class="v-titles">
-      <h2 id="viewer-title"></h2>
-      <p id="viewer-text"></p>
-    </div>
-    <div class="v-actions">
-      <a class="btn btn-primary" id="viewer-download" download>
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg>
-        <span data-i18n="action.download"></span>
-      </a>
-      <button class="btn" type="button" id="viewer-copy" data-i18n="action.copy"></button>
-    </div>
-    <button class="icon-btn v-close" type="button" id="viewer-close" data-i18n-label="action.close" autofocus>
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
-    </button>
-  </div>
-  <div class="stage v-stage" id="viewer-stage" tabindex="0" role="group">
-    <div class="holder" id="viewer-holder"></div>
-    <div class="tip" hidden aria-hidden="true"></div>
-    <div class="zoom">
-      <button class="icon-btn" type="button" data-zoom="in" data-i18n-label="action.zoom_in"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg></button>
-      <button class="icon-btn" type="button" data-zoom="out" data-i18n-label="action.zoom_out"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10"/></svg></button>
-      <button class="icon-btn" type="button" data-zoom="reset" data-i18n-label="action.zoom_reset"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
-    </div>
-  </div>
-  <p class="v-hint" id="viewer-hint"></p>
-</dialog>
-
-<script>
-  const FAMILIES = ["silhouette", "administrative", "physical", "situation"];
-  const HERO_MAP = "administrative.communes";
-  const NAMED = "[data-name], [data-above_m]";
-  const MAX_ZOOM = 24;
-  const coarse = matchMedia("(pointer: coarse)");
-
-  let strings = {};
-  let catalog = [];
-  let locale = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "fr";
-
-  const t = (key, values = {}) =>
-    (strings[key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-  const svgTexts = new Map();
-  function fetchSvg(path) {
-    if (!svgTexts.has(path)) {
-      const request = fetch(path).then((response) => {
-        if (!response.ok) throw new Error(response.status);
-        return response.text();
-      });
-      request.catch(() => svgTexts.delete(path));
-      svgTexts.set(path, request);
-    }
-    return svgTexts.get(path);
-  }
-
-  /* Parses an SVG file into an inline element and gathers what the tooltips need. */
-  function inlineSvg(text, { keepIds = true } = {}) {
-    const parsed = new DOMParser().parseFromString(text, "image/svg+xml").documentElement;
-    const svg = document.importNode(parsed, true);
-    svg.removeAttribute("width");
-    svg.removeAttribute("height");
-    svg.classList.add("map");
-    svg.setAttribute("focusable", "false");
-    const communes = new Map();
-    svg.querySelectorAll("path[data-code][data-name]").forEach((path) => {
-      if (path.id.startsWith("commune-")) communes.set(path.dataset.code, path.dataset.name);
-    });
-    const levels = [...svg.querySelectorAll("[data-above_m]")]
-      .map((node) => Number(node.dataset.above_m)).sort((a, b) => a - b);
-    if (!keepIds) svg.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
-    return { svg, communes, levels, named: Boolean(svg.querySelector(NAMED)) };
-  }
-
-  function describe(node, info) {
-    const data = node.dataset;
-    if (data.above_m !== undefined) {
-      const from = Number(data.above_m);
-      const next = info.levels.find((level) => level > from);
-      const name = next === undefined ? t("tip.relief.top", { from }) : t("tip.relief.band", { from, to: next });
-      return { name, lines: [] };
-    }
-    const lines = [];
-    if (data.kind) lines.push(t(`kind.${data.kind}`));
-    if (data.commune && info.communes.has(data.commune)) lines.push(t("tip.commune", { name: info.communes.get(data.commune) }));
-    const prefix = (node.id || "").split("-")[0];
-    if (data.code && prefix === "commune") lines.push(t("tip.insee", { code: data.code }));
-    if (data.code && prefix === "canton") lines.push(t("tip.canton", { code: data.code }));
-    if (data.code && prefix === "epci") lines.push(t("tip.siren", { code: data.code }));
-    return { name: data.name, lines };
-  }
-
-  /*
-   * Map explorer: hover/tap tooltips with highlight, and, when zoomable, wheel / pinch /
-   * drag / keyboard zoom and pan by rewriting the SVG viewBox (stays vector-sharp).
-   */
-  function createExplorer(stage, holder, { zoomable }) {
-    const tip = stage.querySelector(".tip");
-    let info = null;
-    let base = null;
-    let box = null;
-    let hot = null;
-    let ring = null;
-    const pointers = new Map();
-    let start = null;
-    let moved = false;
-
-    function load(next) {
-      clear();
-      info = next;
-      holder.replaceChildren(info.svg);
-      const [x, y, w, h] = info.svg.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-      base = { x, y, w, h };
-      box = { ...base };
-      ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      ring.setAttribute("class", "ring");
-      ring.style.display = "none";
-      info.svg.append(ring);
-      update();
-    }
-
-    function clear() {
-      info = null;
-      hot = null;
-      tip.hidden = true;
-      pointers.clear();
-    }
-
-    function update() {
-      if (!info) return;
-      info.svg.setAttribute("viewBox", `${box.x} ${box.y} ${box.w} ${box.h}`);
-      const scale = base.w / box.w;
-      stage.querySelectorAll("[data-zoom]").forEach((button) => {
-        const kind = button.dataset.zoom;
-        button.disabled = kind === "in" ? scale >= MAX_ZOOM - 0.01 : scale <= 1.001;
-      });
-    }
-
-    function zoomAt(clientX, clientY, factor) {
-      if (!info || !zoomable) return;
-      const scale = base.w / box.w;
-      const target = clamp(scale * factor, 1, MAX_ZOOM);
-      const f = target / scale;
-      if (Math.abs(f - 1) < 1e-4) return;
-      const point = new DOMPoint(clientX, clientY).matrixTransform(info.svg.getScreenCTM().inverse());
-      box = { x: point.x - (point.x - box.x) / f, y: point.y - (point.y - box.y) / f, w: box.w / f, h: box.h / f };
-      if (target <= 1.001) box = { ...base };
-      keepInside();
-      update();
-    }
-
-    function zoomCentre(factor) {
-      const rect = stage.getBoundingClientRect();
-      zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
-    }
-
-    function panBy(dx, dy) {
-      if (!info || !zoomable) return;
-      const matrix = info.svg.getScreenCTM();
-      box.x -= dx / matrix.a;
-      box.y -= dy / matrix.d;
-      keepInside();
-      update();
-    }
-
-    function keepInside() {
-      const cx = clamp(box.x + box.w / 2, base.x, base.x + base.w);
-      const cy = clamp(box.y + box.h / 2, base.y, base.y + base.h);
-      box.x = cx - box.w / 2;
-      box.y = cy - box.h / 2;
-    }
-
-    function reset() {
-      if (!info) return;
-      box = { ...base };
-      update();
-    }
-
-    function shapeAt(clientX, clientY) {
-      const node = document.elementFromPoint(clientX, clientY)?.closest?.(NAMED);
-      return node && info && info.svg.contains(node) ? node : null;
-    }
-
-    function highlight(node) {
-      if (node === hot) return;
-      if (hot) hot.classList.remove("is-hot");
-      ring.style.display = "none";
-      hot = node;
-      if (!node) return;
-      if (node.tagName === "circle") {
-        const r = Number(node.getAttribute("r")) || 2;
-        ring.setAttribute("cx", node.getAttribute("cx"));
-        ring.setAttribute("cy", node.getAttribute("cy"));
-        const unitsPerPixel = 1 / (info.svg.getScreenCTM()?.a || 1);
-        ring.setAttribute("r", String(Math.max(r * 1.9, 6 * unitsPerPixel)));
-        ring.style.display = "";
-      } else {
-        node.classList.add("is-hot");
-      }
-    }
-
-    function show(node, clientX, clientY, above) {
-      highlight(node);
-      if (!node) { tip.hidden = true; return; }
-      const { name, lines } = describe(node, info);
-      const title = document.createElement("strong");
-      title.textContent = name;
-      tip.replaceChildren(title, ...lines.map((line) => Object.assign(document.createElement("span"), { textContent: line })));
-      tip.hidden = false;
-      const rect = stage.getBoundingClientRect();
-      const width = tip.offsetWidth;
-      const height = tip.offsetHeight;
-      const px = clientX - rect.left;
-      const py = clientY - rect.top;
-      let x = px + 16;
-      let y = above ? py - height - 22 : py + 18;
-      if (above) x = px - width / 2;
-      if (x + width > rect.width - 8) x = px - width - 16;
-      if (y + height > rect.height - 8) y = py - height - 16;
-      if (y < 8) y = py + 22;
-      tip.style.transform = `translate(${clamp(x, 8, rect.width - width - 8)}px, ${clamp(y, 8, rect.height - height - 8)}px)`;
-    }
-
-    function hide() {
-      highlight(null);
-      tip.hidden = true;
-    }
-
-    stage.addEventListener("pointerdown", (event) => {
-      if (!info || event.target.closest("button, a")) return;
-      if (event.pointerType === "mouse" && event.button !== 0) return;
-      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (pointers.size === 1) { start = { x: event.clientX, y: event.clientY }; moved = false; }
-      if (zoomable) stage.setPointerCapture(event.pointerId);
-    });
-
-    stage.addEventListener("pointermove", (event) => {
-      if (!info) return;
-      if (!pointers.has(event.pointerId)) {
-        if (event.pointerType === "mouse") show(shapeAt(event.clientX, event.clientY), event.clientX, event.clientY, false);
-        return;
-      }
-      const before = [...pointers.values()];
-      const previous = pointers.get(event.pointerId);
-      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (!zoomable) return;
-      if (!moved && (pointers.size > 1 || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5)) {
-        moved = true;
-        hide();
-        stage.classList.add("is-dragging");
-      }
-      if (!moved) return;
-      if (pointers.size === 1) {
-        panBy(event.clientX - previous.x, event.clientY - previous.y);
-      } else if (pointers.size === 2 && before.length === 2) {
-        const after = [...pointers.values()];
-        const mid = (list) => ({ x: (list[0].x + list[1].x) / 2, y: (list[0].y + list[1].y) / 2 });
-        const gap = (list) => Math.hypot(list[0].x - list[1].x, list[0].y - list[1].y) || 1;
-        const a = mid(before);
-        const b = mid(after);
-        zoomAt(b.x, b.y, gap(after) / gap(before));
-        panBy(b.x - a.x, b.y - a.y);
-      }
-    });
-
-    function release(event) {
-      if (!pointers.has(event.pointerId)) return;
-      pointers.delete(event.pointerId);
-      if (pointers.size > 0) return;
-      stage.classList.remove("is-dragging");
-      if (event.type === "pointercancel") return;
-      if (!moved) {
-        const node = shapeAt(event.clientX, event.clientY);
-        show(node, event.clientX, event.clientY, event.pointerType !== "mouse");
-      }
-    }
-    stage.addEventListener("pointerup", release);
-    stage.addEventListener("pointercancel", release);
-    stage.addEventListener("pointerleave", (event) => {
-      if (event.pointerType === "mouse" && pointers.size === 0) hide();
-    });
-
-    if (zoomable) {
-      stage.addEventListener("wheel", (event) => {
-        if (!info) return;
-        event.preventDefault();
-        hide();
-        const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-        zoomAt(event.clientX, event.clientY, Math.exp(-clamp(delta, -120, 120) * 0.0022));
-      }, { passive: false });
-      stage.addEventListener("dblclick", (event) => {
-        if (event.target.closest("button, a")) return;
-        zoomAt(event.clientX, event.clientY, event.shiftKey ? 0.5 : 2);
-      });
-      stage.addEventListener("keydown", (event) => {
-        if (event.target !== stage) return;
-        const step = 60;
-        const actions = {
-          ArrowLeft: () => panBy(step, 0), ArrowRight: () => panBy(-step, 0),
-          ArrowUp: () => panBy(0, step), ArrowDown: () => panBy(0, -step),
-          "+": () => zoomCentre(1.5), "=": () => zoomCentre(1.5), "-": () => zoomCentre(1 / 1.5), "0": reset,
-        };
-        if (actions[event.key]) { event.preventDefault(); hide(); actions[event.key](); }
-      });
-      stage.querySelectorAll("[data-zoom]").forEach((button) => {
-        button.addEventListener("click", () => {
-          hide();
-          const kind = button.dataset.zoom;
-          if (kind === "reset") reset();
-          else zoomCentre(kind === "in" ? 1.6 : 1 / 1.6);
-        });
-      });
-    }
-
-    return { load, clear, reset, hide };
-  }
-
-  /* Page rendering */
-  async function load() {
-    const [list, messages] = await Promise.all([
-      catalog.length ? catalog : fetch("dist/catalog.json").then((response) => response.json()),
-      fetch(`i18n/${locale}.json`).then((response) => response.json()),
-    ]);
-    catalog = list;
-    strings = messages;
-    document.documentElement.lang = locale;
-    document.title = t("page.title");
-    document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
-    document.querySelectorAll("[data-i18n-label]").forEach((node) => { node.setAttribute("aria-label", t(node.dataset.i18nLabel)); });
-    document.querySelectorAll("[data-i18n-title]").forEach((node) => { node.title = t(node.dataset.i18nTitle); });
-    document.querySelectorAll(".lang button").forEach((button) => {
-      button.setAttribute("aria-pressed", String(button.dataset.lang === locale));
-    });
-    renderCredit();
-    renderHint();
-    render();
-    if (viewer.open && current) fillViewerText(current);
-  }
-
-  function renderCredit() {
-    const [before, after = ""] = t("page.credit").split("{author}");
-    const link = document.createElement("a");
-    link.href = "https://beeraw.yt";
-    link.textContent = t("page.author");
-    document.getElementById("credit").replaceChildren(before, link, after);
-  }
-
-  function renderHint() {
-    document.getElementById("hero-hint").textContent = t(coarse.matches ? "page.hero.hint.touch" : "page.hero.hint.mouse");
-    const holder = document.getElementById("hero-holder");
-    const hero = catalog.find((map) => map.id === HERO_MAP);
-    holder.querySelector("svg")?.setAttribute("aria-label", hero ? t(`map.${hero.id}`) : "");
-  }
-
-  const countLabel = (n) => t(n === 1 ? "family.count.one" : "family.count.other", { n: n.toLocaleString(locale) });
-
-  function render() {
-    const main = document.getElementById("families");
-    const index = document.getElementById("index");
-    main.replaceChildren();
-    index.replaceChildren();
-    for (const family of FAMILIES) {
-      const maps = catalog.filter((entry) => entry.family === family);
-      if (!maps.length) continue;
-      const section = document.createElement("section");
-      section.className = "family";
-      section.id = `family-${family}`;
-      section.setAttribute("aria-labelledby", `family-${family}-title`);
-      const head = document.createElement("div");
-      head.className = "family-head";
-      const title = document.createElement("h2");
-      title.id = `family-${family}-title`;
-      title.textContent = t(`family.${family}`);
-      const count = document.createElement("p");
-      count.textContent = countLabel(maps.length);
-      head.append(title, count);
-      const grid = document.createElement("div");
-      grid.className = "grid";
-      grid.append(...maps.map(card));
-      section.append(head, grid);
-      main.append(section);
-
-      const item = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = `#${section.id}`;
-      link.append(
-        Object.assign(document.createElement("span"), { textContent: t(`family.${family}`) }),
-        Object.assign(document.createElement("span"), { textContent: countLabel(maps.length) }),
-      );
-      item.append(link);
-      index.append(item);
-    }
-  }
-
-  const sizeLabel = (bytes) =>
-    t("unit.kb", { size: (bytes / 1024).toLocaleString(locale, { maximumFractionDigits: bytes < 10240 ? 1 : 0 }) });
-  const fileName = (map) => map.path.split("/").pop();
-
-  function card(map) {
-    const article = document.createElement("article");
-    article.className = "card";
-    article.innerHTML = `
-      <button class="preview" type="button">
-        <img alt="" loading="lazy" decoding="async">
-        <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
-      </button>
-      <h3></h3>
-      <p></p>
-      <div class="file"><span></span><span></span></div>
-      <div class="actions"><a class="btn btn-primary" download></a><button class="btn" type="button"></button></div>`;
-    const name = t(`map.${map.id}`);
-    const preview = article.querySelector(".preview");
-    preview.setAttribute("aria-label", t("action.open", { name }));
-    preview.addEventListener("click", () => openViewer(map, preview));
-    const image = article.querySelector("img");
-    image.src = map.path;
-    image.alt = name;
-    article.querySelector("h3").textContent = name;
-    article.querySelector("p").textContent = t(`map.${map.id}.text`);
-    const [file, size] = article.querySelectorAll(".file span");
-    file.textContent = fileName(map);
-    size.textContent = sizeLabel(map.bytes);
-    const link = article.querySelector("a");
-    link.href = map.path;
-    link.textContent = t("action.download");
-    const button = article.querySelector(".actions button");
-    button.textContent = t("action.copy");
-    button.addEventListener("click", () => copySvg(map, button));
-    return article;
-  }
-
-  async function copySvg(map, button) {
-    try {
-      const code = await fetchSvg(map.path);
-      await navigator.clipboard.writeText(code);
-      button.textContent = t("action.copied");
-      setTimeout(() => { button.textContent = t("action.copy"); }, 1600);
-    } catch {
-      window.open(map.path, "_blank", "noopener");
-    }
-  }
-
-  /* Enlarged view */
-  const viewer = document.getElementById("viewer");
-  const viewerStage = document.getElementById("viewer-stage");
-  const viewerHolder = document.getElementById("viewer-holder");
-  const explorer = createExplorer(viewerStage, viewerHolder, { zoomable: true });
-  let current = null;
-  let opener = null;
-
-  function fillViewerText(map) {
-    const name = t(`map.${map.id}`);
-    document.getElementById("viewer-title").textContent = name;
-    document.getElementById("viewer-text").textContent = t(`map.${map.id}.text`);
-    viewerStage.setAttribute("aria-label", t("viewer.stage", { name }));
-    const download = document.getElementById("viewer-download");
-    download.href = map.path;
-    download.setAttribute("download", fileName(map));
-    document.getElementById("viewer-copy").textContent = t("action.copy");
-    const named = viewerHolder.querySelector("svg") && current?.named;
-    const mode = coarse.matches ? "touch" : "mouse";
-    document.getElementById("viewer-hint").textContent = t(named ? `viewer.hint.${mode}` : `viewer.hint.plain.${mode}`);
-  }
-
-  async function openViewer(map, trigger) {
-    current = { ...map, named: false };
-    opener = trigger || null;
-    explorer.clear();
-    const status = Object.assign(document.createElement("p"), { className: "status", textContent: t("viewer.loading") });
-    viewerHolder.replaceChildren(status);
-    fillViewerText(current);
-    if (!viewer.open) viewer.showModal();
-    // Deep link: ?open=<map id> reopens this view (also read on page load, see below).
-    const url = new URL(location.href);
-    url.searchParams.set("open", map.id);
-    history.replaceState(null, "", url);
-    try {
-      const text = await fetchSvg(map.path);
-      if (current?.id !== map.id || !viewer.open) return;
-      const info = inlineSvg(text);
-      info.svg.setAttribute("role", "img");
-      info.svg.setAttribute("aria-label", t(`map.${map.id}`));
-      current.named = info.named;
-      explorer.load(info);
-      fillViewerText(current);
-    } catch {
-      if (current?.id === map.id) status.textContent = t("viewer.error");
-    }
-  }
-
-  document.getElementById("viewer-close").addEventListener("click", () => viewer.close());
-  document.getElementById("viewer-copy").addEventListener("click", (event) => { if (current) copySvg(current, event.currentTarget); });
-  viewer.addEventListener("click", (event) => { if (event.target === viewer) viewer.close(); });
-  viewer.addEventListener("close", () => {
-    explorer.clear();
-    viewerHolder.replaceChildren();
-    current = null;
-    const url = new URL(location.href);
-    url.searchParams.delete("open");
-    history.replaceState(null, "", url);
-    if (opener?.isConnected) opener.focus();
-    opener = null;
-  });
-
-  /* Language switch */
-  document.querySelectorAll(".lang button").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (button.dataset.lang === locale) return;
-      locale = button.dataset.lang;
-      const url = new URL(location.href);
-      url.searchParams.set("lang", locale);
-      history.replaceState(null, "", url);
-      load();
-    });
-  });
-  coarse.addEventListener?.("change", () => { renderHint(); if (current) fillViewerText(current); });
-
-  /* Hero: the communes map, live (ids stripped to keep them unique in the page). */
-  const heroExplorer = createExplorer(document.getElementById("hero-stage"), document.getElementById("hero-holder"), { zoomable: false });
-
-  load().then(async () => {
-    const requested = catalog.find((map) => map.id === new URLSearchParams(location.search).get("open"));
-    if (requested) openViewer(requested, null);
-    const hero = catalog.find((map) => map.id === HERO_MAP);
-    if (!hero) return;
-    try {
-      const info = inlineSvg(await fetchSvg(hero.path), { keepIds: false });
-      info.svg.setAttribute("role", "img");
-      heroExplorer.load(info);
-      renderHint();
-    } catch { /* the hero map is decorative: the gallery below stays usable */ }
-  });
-
-</script>
+<script src="assets/gallery.js" defer></script>
 </body>
 </html>

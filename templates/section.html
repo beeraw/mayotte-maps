@@ -1,0 +1,43 @@
+<nav class="wrap sections" data-i18n-label="page.index">
+  <ul class="chips">{{chips}}</ul>
+</nav>
+
+<main class="wrap">
+  <section class="family" aria-labelledby="section-title">
+    <div class="family-head">
+      <h1 id="section-title" data-i18n="family.{{id}}"></h1>
+      <p class="text" data-i18n="family.{{id}}.text"></p>
+      {{count}}
+    </div>
+    {{content}}
+  </section>
+</main>
+
+<dialog class="viewer" id="viewer" aria-labelledby="viewer-title" aria-describedby="viewer-text">
+  <div class="v-bar">
+    <div class="v-titles">
+      <h2 id="viewer-title"></h2>
+      <p id="viewer-text"></p>
+    </div>
+    <div class="v-actions">
+      <a class="btn btn-primary" id="viewer-download" download>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg>
+        <span data-i18n="action.download"></span>
+      </a>
+      <button class="btn" type="button" id="viewer-copy" data-i18n="action.copy"></button>
+    </div>
+    <button class="icon-btn v-close" type="button" id="viewer-close" data-i18n-label="action.close" autofocus>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
+    </button>
+  </div>
+  <div class="stage v-stage" id="viewer-stage" tabindex="0" role="group">
+    <div class="holder" id="viewer-holder"></div>
+    <div class="tip" hidden aria-hidden="true"></div>
+    <div class="zoom">
+      <button class="icon-btn" type="button" data-zoom="in" data-i18n-label="action.zoom_in"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg></button>
+      <button class="icon-btn" type="button" data-zoom="out" data-i18n-label="action.zoom_out"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10"/></svg></button>
+      <button class="icon-btn" type="button" data-zoom="reset" data-i18n-label="action.zoom_reset"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
+    </div>
+  </div>
+  <p class="v-hint" id="viewer-hint"></p>
+</dialog>

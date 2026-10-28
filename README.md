@@ -147,7 +147,9 @@ npm install
 npm run all
 ```
 
-Les étapes peuvent se lancer séparément : `npm run fetch` (téléchargements), `npm run prepare-data` (tracés et extraction), `npm run build` (SVG, GeoJSON, TopoJSON, catalogue de la galerie).
+Les étapes peuvent se lancer séparément : `npm run fetch` (téléchargements), `npm run prepare-data` (tracés et extraction), `npm run build` (SVG, GeoJSON, TopoJSON, catalogue de la galerie, puis pages de la galerie).
+
+Les pages de la galerie sont des fichiers HTML statiques générés par `scripts/pages.mjs` (`npm run pages` pour les seules pages) : l'accueil `index.html` et une page par rubrique (`administrative/index.html`…). Le script assemble les gabarits de `templates/`, le catalogue `dist/catalog.json` et les textes de `i18n/fr.json`, écrits en dur dans les pages pour qu'elles se lisent sans JavaScript ; `assets/gallery.js` passe ensuite en anglais avec `?lang=en`. La liste et l'ordre des rubriques, la carte d'accueil et la carte qui illustre chaque rubrique se règlent dans `templates/site.json`. Ne pas modifier les pages générées à la main : elles sont réécrites à chaque construction.
 
 ## Sources
 
