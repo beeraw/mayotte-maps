@@ -311,13 +311,13 @@ async function situation() {
           `-each 'svg_id = "mayotte-locator"' -proj ${projection} -style r=14 fill=none stroke='#c4553d' stroke-width=1.5`,
         ]
       : [];
-    const targets = locator ? "countries,mayotte,locator" : "countries,mayotte";
+    const targets = locator ? "countries,island,locator" : "countries,island";
     const commands = [
       `-rectangle bbox=${bbox} name=frame -densify interval=5000 -proj ${projection}`,
       `-i ${naturalEarth}/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp name=countries`,
       `-clip bbox=${bbox} -filter 'ADM0_A3 != "FRA"' -each 'svg_id = "country-" + ADM0_A3.toLowerCase()'`,
       `-proj ${projection} -style fill='#e4dccb' stroke='#ffffff' stroke-width=0.6`,
-      `-i ${work}/land.geojson name=mayotte -proj init=${CRS} -dissolve -simplify interval=${SIMPLIFY.standard}`,
+      `-i ${work}/land.geojson name=island -proj init=${CRS} -dissolve -simplify interval=${SIMPLIFY.standard}`,
       `-each 'svg_id = "mayotte"' -proj ${projection} -style fill='#c4553d' stroke='none'`,
       ...locatorLayer,
       `-o ${dist}/svg/situation/${name}.svg target=${targets} fit-extent=frame width=${WIDTH} id-field=svg_id`,
