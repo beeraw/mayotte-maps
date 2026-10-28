@@ -145,11 +145,11 @@
   .stage .holder { position: absolute; inset: 0; display: grid; place-items: center; }
   .hero-map .holder { inset: 4% 4%; }
   .map { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; }
-  .map [data-name], .map [data-ref], .map [data-above_m] { cursor: pointer; }
-  .map path[data-name], .map path[data-above_m] { transition: fill 120ms ease; }
+  .map [data-name], .map [data-ref], .map [data-kind], .map [data-above_m] { cursor: pointer; }
+  .map path[data-name], .map path[data-kind], .map path[data-above_m] { transition: fill 120ms ease; }
   .map circle[data-name] { stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; }
   @media (pointer: coarse) { .map circle[data-name] { stroke-width: 24px; } }
-  .map .is-hot { fill: var(--ylang); }
+  .map .is-hot { fill: var(--ylang); fill-opacity: 1; }
   /* Lines are thin: a wide transparent copy above the map catches the pointer */
   .map .hit { fill: none; stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; pointer-events: stroke; cursor: pointer; }
   @media (pointer: coarse) { .map .hit { stroke-width: 26px; } }
@@ -351,7 +351,7 @@
 <script>
   const FAMILIES = ["silhouette", "administrative", "physical", "network", "built", "situation"];
   const HERO_MAP = "administrative.communes";
-  const NAMED = "[data-name], [data-ref], [data-above_m]";
+  const NAMED = "[data-name], [data-ref], [data-kind], [data-above_m]";
   const SVG_NS = "http://www.w3.org/2000/svg";
   const MAX_ZOOM = 24;
   const coarse = matchMedia("(pointer: coarse)");
@@ -429,13 +429,18 @@
       return { name, lines: [] };
     }
     const lines = [];
-    if (data.kind) lines.push(t(`kind.${data.kind}`));
+    if (data.kind && data.name) lines.push(t(`kind.${data.kind}`));
+    if (data.area_ha !== undefined) {
+      const hectares = Number(data.area_ha);
+      lines.push(hectares < 1 ? t("tip.area.small")
+        : t("tip.area", { area: hectares.toLocaleString(locale, { maximumFractionDigits: hectares < 10 ? 1 : 0 }) }));
+    }
     if (data.commune && info.communes.has(data.commune)) lines.push(t("tip.commune", { name: info.communes.get(data.commune) }));
     const prefix = (node.id || "").split("-")[0];
     if (data.code && prefix === "commune") lines.push(t("tip.insee", { code: data.code }));
     if (data.code && prefix === "canton") lines.push(t("tip.canton", { code: data.code }));
     if (data.code && prefix === "epci") lines.push(t("tip.siren", { code: data.code }));
-    return { name: data.name, lines };
+    return { name: data.name || t(`kind.${data.kind}`), lines };
   }
 
   /*

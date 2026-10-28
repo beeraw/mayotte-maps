@@ -91,6 +91,35 @@ function strokeStyle(styles) {
   return `-style stroke="${pick(0)}" stroke-width="${pick(1)}" stroke-dasharray="${pick(2)}" fill=none`;
 }
 
+// Vegetation and protected areas: [fill, fill-opacity, stroke]. Mangroves match hydrography.svg
+const VEGETATION_STYLES = {
+  "broadleaf-forest": ["#86ad74", 1, "none"],
+  woodlot: ["#a9c48c", 1, "none"],
+  shrubland: ["#cfcc98", 1, "none"],
+  "banana-plantation": ["#c4b45a", 1, "none"],
+  orchard: ["#d4a566", 1, "none"],
+  mangrove: ["#4f8a5b", 1, "none"],
+};
+
+const PROTECTED_STYLES = {
+  "departmental-forest": ["#c9dcae", 1, "#8fb070"],
+  "state-forest": ["#a9cb8e", 1, "#6f9a55"],
+  "nature-reserve": ["#4f8a5b", 0.55, "#3b6e46"],
+  "coastal-conservancy": ["#e0b064", 0.8, "#b5833a"],
+  "ramsar-site": ["#3d8fc1", 0.3, "#2f74a0"],
+  "biotope-protection": ["#c4553d", 0.3, "#a3432f"],
+  intertidal: ["#ecdcae", 1, "none"],
+  lake: ["#6fb3d6", 1, "none"],
+  reservoir: ["#6fb3d6", 1, "none"],
+  "coastal-lagoon": ["#6fb3d6", 1, "none"],
+};
+
+function styleByKind(styles) {
+  const pick = (index, fallback) =>
+    Object.entries(styles).map(([kind, style]) => `kind == '${kind}' ? '${style[index]}'`).join(" : ") + ` : '${fallback}'`;
+  return `-style fill="${pick(0, "none")}" fill-opacity="${pick(1, 1)}" stroke="${pick(2, "none")}" stroke-width=0.6`;
+}
+
 const RELIEF_COLORS =["#dfe6c6", "#c9d8a6", "#b6c98e", "#c8b98a", "#b39c72", "#9a8060", "#86705a"];
 
 const SIMPLIFY = { detailed: 5, standard: 25, simple: 150 };
@@ -179,6 +208,19 @@ async function physical() {
     `${layer("reef")} -simplify interval=${SIMPLIFY.detailed} -style ${STYLE.reef}`,
     `${layer("land")} -dissolve -simplify interval=${SIMPLIFY.detailed} -style ${STYLE.land}`,
   ]);
+  await svg("physical/vegetation.svg", "island", [
+    `${layer("land")} -dissolve -simplify interval=${SIMPLIFY.standard} -style ${STYLE.land}`,
+    // Patches under 1 ha are dropped, except woodlots, which are all smaller
+    `${layer("vegetation")} -filter 'kind != "woodlot"' -simplify interval=30 -filter-islands min-area=10000 -filter-slivers min-area=10000 ` +
+      `-i ${work}/vegetation.geojson name=woodlots -proj init=${CRS} -filter 'kind == "woodlot"' -simplify interval=30 ` +
+      `-merge-layers target=vegetation,woodlots name=vegetation -each 'svg_id = "vegetation-" + kind' ${styleByKind(VEGETATION_STYLES)}`,
+  ], "svg-data=kind,area_ha");
+  await svg("physical/protected-areas.svg", "island", [
+    `${layer("land")} -dissolve -simplify interval=${SIMPLIFY.standard} -style ${STYLE.land}`,
+    `${layer("intertidal")} -simplify interval=5 -each 'svg_id = "intertidal"' ${styleByKind(PROTECTED_STYLES)}`,
+    `${layer("lakes")} -simplify interval=5 -each 'svg_id = "lake-" + slug, name = name || ""' ${styleByKind(PROTECTED_STYLES)}`,
+    `${layer("protected_areas")} -simplify interval=10 keep-shapes -each 'svg_id = "protected-" + slug' ${styleByKind(PROTECTED_STYLES)}`,
+  ], "svg-data=name,kind,area_ha");
 }
 
 // mapshaper writes missing values as the string "null": drop those attributes
@@ -240,7 +282,8 @@ async function situation() {
 }
 
 async function geodata() {
-  const layers = ["land", "lagoon", "reef", "communes", "cantons", "epci", "villages", "places", "rivers", "mangroves", "relief", "roads", "trails", "services"];
+  const layers = ["land", "lagoon", "reef", "communes", "cantons", "epci", "villages", "places", "rivers", "mangroves", "relief", "roads", "trails", "services",
+    "vegetation", "protected_areas", "intertidal", "lakes"];
   for (const name of layers) {
     await mapshaper.runCommands(
       `${layer(name)} -simplify interval=5 keep-shapes -proj wgs84 -o ${dist}/geojson/mayotte-${name}.geojson precision=0.000001`,
@@ -261,7 +304,7 @@ async function geodata() {
 const CATALOG_ORDER = {
   silhouette: ["mayotte", "mayotte-detailed", "mayotte-simple", "mayotte-outline", "mayotte-lagoon"],
   administrative: ["communes", "cantons", "epci", "villages", "places"],
-  physical: ["relief", "hydrography", "lagoon"],
+  physical: ["relief", "hydrography", "lagoon", "vegetation", "protected-areas"],
   network: ["roads-main", "roads-full", "trails"],
   built: ["services"],
   situation: ["mozambique-channel", "comoros-archipelago"],
