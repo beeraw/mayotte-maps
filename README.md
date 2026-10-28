@@ -23,6 +23,8 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 | Physique | `dist/svg/physical/relief.svg` | Relief en aplats de 100 m |
 | | `hydrography.svg` | Cours d'eau permanents et mangroves |
 | | `lagoon.svg` | Lagon, récifs et hauts-fonds, version détaillée |
+| | `vegetation.svg` | Couvert végétal en 6 classes : forêt, bosquets, landes, bananeraies, vergers, mangroves (370 Ko) |
+| | `protected-areas.svg` | 41 espaces protégés nommés (réserves naturelles, Conservatoire du littoral, forêts publiques…), estran et plans d'eau |
 | Situation | `dist/svg/situation/mozambique-channel.svg` | Mayotte entre l'Afrique et Madagascar |
 | | `comoros-archipelago.svg` | Mayotte dans l'archipel des Comores |
 
@@ -30,7 +32,7 @@ La galerie `index.html` présente toutes les cartes, avec téléchargement et co
 
 Les mêmes couches existent en données géographiques, en WGS84 (longitude, latitude) :
 
-- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief` ;
+- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `vegetation`, `protected_areas`, `intertidal`, `lakes` ;
 - `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger.
 
 ## Utiliser les SVG
@@ -47,6 +49,9 @@ Chaque forme porte un `id` stable et des attributs `data-*` :
 | Villages | `village-97611-kaweni` (commune + nom) | `data-name`, `data-commune` |
 | Lieux nommés | `place-97611-kaweni`, `place-97611-hamaha-summit` pour un homonyme | `data-name`, `data-kind`, `data-commune` |
 | Relief | `relief-300` (altitude du niveau) | `data-above_m` |
+| Végétation | `vegetation-mangrove` (classe) | `data-kind`, `data-area_ha` |
+| Espaces protégés | `protected-reserve-naturelle-nationale-de-l-ilot-mbouzi` (nom), `protected-n-gouja-biotope-protection` pour un homonyme | `data-name`, `data-kind`, `data-area_ha` |
+| Estran, plans d'eau | `intertidal`, `lake-dziana-dzaha` (nom) | `data-name` (sauf l'estran et une lagune sans nom), `data-kind`, `data-area_ha` |
 | Situation | `mayotte`, `mayotte-locator`, `country-mdg`… | — |
 
 Les noms sont les noms officiels du Code officiel géographique (par exemple « Bandrele », sans accent).
@@ -69,7 +74,7 @@ Pour que le CSS de la page s'applique, le SVG doit être **intégré dans le HTM
 
 Toutes les cartes de l'île partagent l'un de deux cadres, et se superposent au pixel près :
 
-- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography` ;
+- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, `vegetation`, `protected-areas` ;
 - **cadre lagon** : `mayotte-lagoon`, `lagoon`.
 
 Exemple : le relief sous les limites de communes, en empilant `relief.svg` puis `communes.svg` avec un remplissage transparent.
@@ -97,6 +102,35 @@ Pour n'afficher qu'un type de lieu :
 
 Les noms suivent l'orthographe de l'IGN. Un lieu absent de la BD TOPO n'apparaît pas : la carte reflète ce que l'IGN a recensé, pas tous les noms en usage.
 
+### Végétation et espaces protégés
+
+`vegetation.svg` regroupe les zones de végétation de la BD TOPO en une forme par classe (`data-kind`) :
+
+| `data-kind` | Classe BD TOPO | Surface |
+|---|---|---|
+| `broadleaf-forest` | Forêt fermée de feuillus | 22 283 ha |
+| `shrubland` | Lande ligneuse | 1 729 ha |
+| `banana-plantation` | Bananeraie | 1 305 ha |
+| `orchard` | Verger | 766 ha |
+| `mangrove` | Mangrove (même vert que `hydrography.svg`) | 685 ha |
+| `woodlot` | Bois (bosquets de moins de 5 ha) | 150 ha |
+
+Pour garder un fichier léger, les taches de moins d'un hectare sont retirées du SVG, sauf les bosquets, tous petits. Le GeoJSON garde tout.
+
+`protected-areas.svg` montre les espaces protégés nommés, l'estran (sable et galets découverts à marée basse) et les plans d'eau. Les formes se chevauchent : la réserve des forêts recouvre en partie les forêts publiques, le site Ramsar et l'arrêté de biotope de N'Gouja recouvrent des terrains du Conservatoire.
+
+| `data-kind` | Espaces | Nombre |
+|---|---|---|
+| `departmental-forest`, `state-forest` | forêts départementales et domaniales | 9 + 3 |
+| `nature-reserve` | réserves naturelles nationales (forêts de Mayotte, îlot Mbouzi) | 2 |
+| `coastal-conservancy` | terrains du Conservatoire du littoral | 24 |
+| `ramsar-site` | site Ramsar de la vasière des Badamiers | 1 |
+| `biotope-protection` | arrêtés de protection de biotope | 2 |
+| `intertidal` | estran | 1 |
+| `lake`, `reservoir`, `coastal-lagoon` | lac Dziani Dzaha, retenues collinaires, lagune | 5 |
+
+Le Parc naturel marin de Mayotte n'y figure pas : il couvre toute la zone économique exclusive (63 700 km²), bien au-delà du cadre de l'île. Les noms suivent l'orthographe de l'IGN (« Dziana Dzaha » pour le lac Dziani Dzaha).
+
 ### Aucun texte dans les cartes
 
 Les SVG ne contiennent aucune étiquette : chacun ajoute les siennes, dans sa langue et sa police. Les noms sont dans les attributs `data-name`, et les centres des villages sont donnés par les cercles de `villages.svg`.
@@ -123,6 +157,7 @@ d3.select("svg").selectAll("path")
   - lagon : enveloppe convexe du système récifal, ramenée à 2,5 km au plus de tout récif ou de toute terre, puis lissée.
 - **Communes, cantons, intercommunalités, villages, cours d'eau, mangroves** : données IGN, simplifiées sans trou ni chevauchement entre voisins.
 - **Relief** : modèle numérique BD ALTI de l'IGN, au pas de 25 m.
+- **Végétation, espaces protégés, estran, plans d'eau** : BD TOPO de l'IGN ; la végétation est fusionnée par classe.
 
 ### Limites connues
 
@@ -172,6 +207,8 @@ La Licence Ouverte de l'IGN suit ses données partout : nous ne pouvons pas leve
 | `villages.svg`, `places.svg` | `villages`, `places` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `hydrography.svg` | `rivers`, `mangroves` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `relief.svg` | `relief` | IGN – BD ALTI | « Source : IGN – BD ALTI » |
+| `vegetation.svg` | `vegetation` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
+| `protected-areas.svg` | `protected_areas`, `intertidal`, `lakes` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 
 `villages.svg` et `places.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
 
@@ -183,4 +220,4 @@ Auteur : Jean-Luc Petit.
 
 ## English summary
 
-Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, lagoon and reefs, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, rivers, mangroves and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.
+Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, vegetation cover, protected natural areas, lagoon and reefs, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, rivers, mangroves, vegetation, protected areas and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.

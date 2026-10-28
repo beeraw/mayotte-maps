@@ -131,6 +131,70 @@ def places():
     write("places", features)
 
 
+VEGETATION_KINDS = {
+    "Forêt fermée de feuillus": "broadleaf-forest",
+    "Bois": "woodlot",
+    "Lande ligneuse": "shrubland",
+    "Bananeraie": "banana-plantation",
+    "Verger": "orchard",
+    "Mangrove": "mangrove",
+}
+
+# Drawing order, the widest areas first. The marine park covers the whole exclusive economic zone: left out
+PROTECTED_KINDS = {
+    ("foret_publique", "Autre forêt publique"): "departmental-forest",
+    ("foret_publique", "Forêt domaniale"): "state-forest",
+    ("parc_ou_reserve", "Réserve naturelle"): "nature-reserve",
+    ("parc_ou_reserve", "Terrain du Conservatoire du Littoral"): "coastal-conservancy",
+    ("parc_ou_reserve", "Site Ramsar"): "ramsar-site",
+    ("parc_ou_reserve", "Arrêté de protection"): "biotope-protection",
+}
+
+WATER_KINDS = {"Lac": "lake", "Retenue-barrage": "reservoir", "Retenue": "reservoir", "Lagune": "coastal-lagoon"}
+
+
+def hectares(geom):
+    return round(geom.area / 10000, 1)
+
+
+def nature():
+    """Vegetation cover, protected areas, intertidal zone and lakes."""
+    path = source("BDTOPO*/**/*.gpkg")
+    vegetation = read(path, "zone_de_vegetation", ["nature"])
+    features = []
+    for nature_name, kind in VEGETATION_KINDS.items():
+        merged = unary_union([geom.buffer(0) for geom, row in vegetation if row["nature"] == nature_name])
+        features.append((merged, {"kind": kind, "area_ha": hectares(merged)}))
+    write("vegetation", features)
+
+    features = []
+    for (layer, nature_name), kind in PROTECTED_KINDS.items():
+        rows = read(path, layer, ["toponyme"], where=f"nature = '{nature_name}'")
+        for geom, row in sorted(rows, key=lambda item: -item[0].area):
+            geom = geom.buffer(0)
+            features.append((geom, {"slug": slugify(row["toponyme"]), "name": row["toponyme"], "kind": kind,
+                                    "area_ha": hectares(geom)}))
+    slugs = [props["slug"] for _, props in features]
+    for _, props in features:
+        if slugs.count(props["slug"]) > 1:
+            props["slug"] = f"{props['slug']}-{props['kind']}"
+    if len({props["slug"] for _, props in features}) != len(features):
+        raise SystemExit("duplicate protected area identifiers")
+    write("protected_areas", features)
+
+    estran = unary_union([geom.buffer(0) for geom, _ in read(path, "zone_d_estran", [])])
+    write("intertidal", [(estran, {"kind": "intertidal", "area_ha": hectares(estran)})])
+
+    features = []
+    for geom, row in sorted(read(path, "plan_d_eau", ["nature", "toponyme"]), key=lambda item: -item[0].area):
+        kind = WATER_KINDS[row["nature"]]
+        props = {"slug": slugify(row["toponyme"]) if row["toponyme"] else kind, "kind": kind, "area_ha": hectares(geom)}
+        if row["toponyme"]:
+            props["name"] = row["toponyme"]
+        features.append((geom, props))
+    write("lakes", features)
+
+
 def relief():
     tiles = [rasterio.open(path) for path in glob.glob(str(SRC / "BDALTI*/**/*_MNT_*.asc"), recursive=True)]
     # The tiles carry no CRS: passing nodata to merge() blanks them, their own -99999 is kept instead
@@ -154,4 +218,5 @@ if __name__ == "__main__":
     administrative()
     topography()
     places()
+    nature()
     relief()
