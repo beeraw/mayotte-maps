@@ -12,9 +12,9 @@ import numpy as np
 import pyogrio
 import rasterio
 from rasterio.merge import merge
-from shapely import from_wkb
+from shapely import force_2d, from_wkb
 from shapely.geometry import mapping
-from shapely.ops import unary_union
+from shapely.ops import linemerge, unary_union
 
 from derive_sentinel import contour_polygons, write
 
@@ -150,8 +150,96 @@ def relief():
     write("relief", features)
 
 
+ROAD_COLUMNS = ["nature", "importance", "cpx_numero", "cpx_classement_administratif", "cpx_toponyme_route_nommee",
+                "nom_voie_ban_gauche", "nom_voie_ban_droite", "insee_commune_gauche", "insee_commune_droite"]
+ROUTE_KINDS = {"Nationale": "national", "Départementale": "departmental"}
+TRACK_NATURES = ("Chemin", "Route empierrée")
+TRAIL_KINDS = {"Sentier": "trail", "Escalier": "steps"}
+
+
+def merged(geoms):
+    """One line geometry per group: segments joined end to end, without the Z values."""
+    union = unary_union([force_2d(geom) for geom in geoms])
+    return linemerge(union) if union.geom_type == "MultiLineString" else union
+
+
+def complete(props):
+    """Same fields on every feature, null when absent, so that no attribute reads "undefined"."""
+    return {key: props.get(key) for key in ("slug", "ref", "kind", "name", "commune")}
+
+
+def named_groups(segments, kind):
+    """Segments grouped by street name and commune; unnamed ones dissolved together."""
+    groups = {}
+    for geom, row in segments:
+        name = row["nom_voie_ban_gauche"] or row["nom_voie_ban_droite"]
+        commune = row["insee_commune_gauche"] or row["insee_commune_droite"]
+        key = (name, commune) if name and commune else (None, None)
+        groups.setdefault(key, []).append(geom)
+    features = []
+    for (name, commune), geoms in sorted(groups.items(), key=lambda item: (item[0][1] or "", item[0][0] or "")):
+        props = {"kind": kind}
+        if name:
+            props.update(name=name, commune=commune)
+        features.append((merged(geoms), props))
+    return features
+
+
+def roads():
+    """Road network: numbered roads one feature per number, sea links, then the local network by class."""
+    path = source("BDTOPO*/**/*.gpkg")
+    segments = read(path, "troncon_de_route", ROAD_COLUMNS, where="etat_de_l_objet = 'En service'")
+    features = []
+
+    numbered = {}
+    for geom, row in segments:
+        if row["cpx_numero"]:
+            numbered.setdefault(row["cpx_numero"], []).append((geom, row))
+    # Nationals last, so that they are drawn (and hovered) on top
+    order = sorted(numbered, key=lambda ref: (ref[0] != "D", int(re.sub(r"\D", "", ref) or 0), ref))
+    for ref in order:
+        rows = numbered[ref]
+        kind = "national" if ref.startswith("N") else "departmental"
+        props = {"slug": slugify(ref), "ref": ref, "kind": kind}
+        # A street name is kept only when it covers the whole road (Route de Moya = D9)
+        names = {row["cpx_toponyme_route_nommee"] for _, row in rows}
+        if len(names) == 1 and None not in names:
+            props["name"] = names.pop()
+        features.append((merged([geom for geom, _ in rows]), props))
+
+    for geom, row in segments:
+        if row["nature"] == "Bac ou liaison maritime":
+            name = row["cpx_toponyme_route_nommee"]
+            features.append((force_2d(geom), {"slug": slugify(name), "kind": "ferry", "name": name}))
+
+    unnumbered = [(geom, row) for geom, row in segments if not row["cpx_numero"]]
+    roads_only = [(geom, row) for geom, row in unnumbered
+                  if row["nature"] in ("Route à 1 chaussée", "Route à 2 chaussées", "Rond-point")]
+    local_classes = [
+        ("secondary", [item for item in roads_only if item[1]["importance"] in ("2", "3", "4")]),
+        ("local", [item for item in roads_only if item[1]["importance"] not in ("2", "3", "4")]),
+        ("track", [item for item in unnumbered if item[1]["nature"] in TRACK_NATURES]),
+    ]
+    # Local classes are drawn first, under the numbered roads
+    network = [feature for kind, items in local_classes for feature in named_groups(items, kind)]
+    write("roads", [(geom, complete(props)) for geom, props in network + features])
+
+
+def trails():
+    """Footpaths and steps, grouped by street name where the BAN gives one."""
+    path = source("BDTOPO*/**/*.gpkg")
+    features = []
+    for nature, kind in TRAIL_KINDS.items():
+        segments = read(path, "troncon_de_route", ROAD_COLUMNS,
+                        where=f"etat_de_l_objet = 'En service' AND nature = '{nature}'")
+        features += named_groups(segments, kind)
+    write("trails", [(geom, complete(props)) for geom, props in features])
+
+
 if __name__ == "__main__":
     administrative()
     topography()
     places()
     relief()
+    roads()
+    trails()

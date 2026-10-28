@@ -145,11 +145,18 @@
   .stage .holder { position: absolute; inset: 0; display: grid; place-items: center; }
   .hero-map .holder { inset: 4% 4%; }
   .map { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; }
-  .map [data-name], .map [data-above_m] { cursor: pointer; }
+  .map [data-name], .map [data-ref], .map [data-above_m] { cursor: pointer; }
   .map path[data-name], .map path[data-above_m] { transition: fill 120ms ease; }
   .map circle[data-name] { stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; }
   @media (pointer: coarse) { .map circle[data-name] { stroke-width: 24px; } }
   .map .is-hot { fill: var(--ylang); }
+  /* Lines are thin: a wide transparent copy above the map catches the pointer */
+  .map .hit { fill: none; stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; pointer-events: stroke; cursor: pointer; }
+  @media (pointer: coarse) { .map .hit { stroke-width: 26px; } }
+  .map .trace { pointer-events: none; }
+  .map .trace path { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+  .map .trace path:first-child { stroke: #0f2e2c; stroke-width: 6px; }
+  .map .trace path:last-child { stroke: var(--ylang); stroke-width: 3.5px; }
   .map .ring { fill: var(--ylang); stroke: #0f2e2c; stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
 
   .tip {
@@ -342,9 +349,10 @@
 </dialog>
 
 <script>
-  const FAMILIES = ["silhouette", "administrative", "physical", "situation"];
+  const FAMILIES = ["silhouette", "administrative", "physical", "network", "situation"];
   const HERO_MAP = "administrative.communes";
-  const NAMED = "[data-name], [data-above_m]";
+  const NAMED = "[data-name], [data-ref], [data-above_m]";
+  const SVG_NS = "http://www.w3.org/2000/svg";
   const MAX_ZOOM = 24;
   const coarse = matchMedia("(pointer: coarse)");
 
@@ -384,11 +392,36 @@
     const levels = [...svg.querySelectorAll("[data-above_m]")]
       .map((node) => Number(node.dataset.above_m)).sort((a, b) => a - b);
     if (!keepIds) svg.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
-    return { svg, communes, levels, named: Boolean(svg.querySelector(NAMED)) };
+    const hits = lineHits(svg);
+    return { svg, communes, levels, hits, named: Boolean(svg.querySelector(NAMED)) };
+  }
+
+  /*
+   * Named lines (roads, sea links, footpaths) get an invisible wide copy in a group drawn
+   * last, so they win over the land underneath; the copies keep the drawing order, so the
+   * strongest roads (drawn last) win where lines cross. Returns copy -> original.
+   */
+  function lineHits(svg) {
+    const hits = new WeakMap();
+    const lines = [...svg.querySelectorAll(`path:is(${NAMED})`)]
+      .filter((path) => path.closest("[fill]")?.getAttribute("fill") === "none");
+    if (!lines.length) return hits;
+    const group = document.createElementNS(SVG_NS, "g");
+    group.setAttribute("class", "hits");
+    for (const line of lines) {
+      const hit = document.createElementNS(SVG_NS, "path");
+      hit.setAttribute("class", "hit");
+      hit.setAttribute("d", line.getAttribute("d"));
+      hits.set(hit, line);
+      group.append(hit);
+    }
+    svg.append(group);
+    return hits;
   }
 
   function describe(node, info) {
     const data = node.dataset;
+    if (data.ref) return { name: t(`tip.road.${data.kind}`, { ref: data.ref }), lines: data.name ? [data.name] : [] };
     if (data.above_m !== undefined) {
       const from = Number(data.above_m);
       const next = info.levels.find((level) => level > from);
@@ -416,6 +449,7 @@
     let box = null;
     let hot = null;
     let ring = null;
+    let trace = null;
     const pointers = new Map();
     let start = null;
     let moved = false;
@@ -427,10 +461,14 @@
       const [x, y, w, h] = info.svg.getAttribute("viewBox").split(/[\s,]+/).map(Number);
       base = { x, y, w, h };
       box = { ...base };
-      ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      ring = document.createElementNS(SVG_NS, "circle");
       ring.setAttribute("class", "ring");
       ring.style.display = "none";
-      info.svg.append(ring);
+      trace = document.createElementNS(SVG_NS, "g");
+      trace.setAttribute("class", "trace");
+      trace.style.display = "none";
+      trace.append(document.createElementNS(SVG_NS, "path"), document.createElementNS(SVG_NS, "path"));
+      info.svg.append(trace, ring);
       update();
     }
 
@@ -492,17 +530,24 @@
     }
 
     function shapeAt(clientX, clientY) {
-      const node = document.elementFromPoint(clientX, clientY)?.closest?.(NAMED);
-      return node && info && info.svg.contains(node) ? node : null;
+      if (!info) return null;
+      const target = document.elementFromPoint(clientX, clientY);
+      const node = info.hits.get(target) || target?.closest?.(NAMED);
+      return node && info.svg.contains(node) ? node : null;
     }
 
     function highlight(node) {
       if (node === hot) return;
       if (hot) hot.classList.remove("is-hot");
       ring.style.display = "none";
+      trace.style.display = "none";
       hot = node;
       if (!node) return;
-      if (node.tagName === "circle") {
+      if (node.tagName === "path" && node.closest("[fill]")?.getAttribute("fill") === "none") {
+        // A line: draw a highlighted copy on top rather than filling the path
+        trace.querySelectorAll("path").forEach((path) => path.setAttribute("d", node.getAttribute("d")));
+        trace.style.display = "";
+      } else if (node.tagName === "circle") {
         const r = Number(node.getAttribute("r")) || 2;
         ring.setAttribute("cx", node.getAttribute("cx"));
         ring.setAttribute("cy", node.getAttribute("cy"));

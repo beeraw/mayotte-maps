@@ -1,6 +1,6 @@
 # Cartes de Mayotte
 
-Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, découpages administratifs, relief, lagon et cartes de situation. En SVG pour l'affichage, en GeoJSON et TopoJSON pour les applications cartographiques.
+Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, découpages administratifs, relief, lagon, routes et sentiers, cartes de situation. En SVG pour l'affichage, en GeoJSON et TopoJSON pour les applications cartographiques.
 
 **Cartes dans le domaine public (CC0 1.0)** : utilisables partout, y compris dans un projet commercial, sans demander l'autorisation. Les silhouettes, le lagon et les cartes de situation sont libres sans aucune condition. Les autres cartes reprennent des données de l'IGN : en les réutilisant, citez « Source : IGN » (voir [Quelle mention pour quelle carte](#quelle-mention-pour-quelle-carte)).
 
@@ -23,6 +23,9 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 | Physique | `dist/svg/physical/relief.svg` | Relief en aplats de 100 m |
 | | `hydrography.svg` | Cours d'eau permanents et mangroves |
 | | `lagoon.svg` | Lagon, récifs et hauts-fonds, version détaillée |
+| Réseaux | `dist/svg/network/roads-main.svg` | Routes nationales et départementales, une forme par numéro, et liaisons maritimes (99 Ko) |
+| | `roads-full.svg` | Réseau routier complet : près de 1 300 km de routes, rues, chemins et pistes, avec le nom des rues (798 Ko) |
+| | `trails.svg` | Sentiers et escaliers, routes principales en blanc pour se repérer (705 Ko) |
 | Situation | `dist/svg/situation/mozambique-channel.svg` | Mayotte entre l'Afrique et Madagascar |
 | | `comoros-archipelago.svg` | Mayotte dans l'archipel des Comores |
 
@@ -30,8 +33,8 @@ La galerie `index.html` présente toutes les cartes, avec téléchargement et co
 
 Les mêmes couches existent en données géographiques, en WGS84 (longitude, latitude) :
 
-- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief` ;
-- `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger.
+- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `roads` (routes et liaisons maritimes), `trails` (sentiers et escaliers) ;
+- `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger. Pour rester léger, il garde les routes numérotées et les liaisons maritimes, mais regroupe le reste du réseau et les sentiers par classe, sans le nom des rues : ces noms sont dans les GeoJSON `roads` et `trails`.
 
 ## Utiliser les SVG
 
@@ -47,6 +50,9 @@ Chaque forme porte un `id` stable et des attributs `data-*` :
 | Villages | `village-97611-kaweni` (commune + nom) | `data-name`, `data-commune` |
 | Lieux nommés | `place-97611-kaweni`, `place-97611-hamaha-summit` pour un homonyme | `data-name`, `data-kind`, `data-commune` |
 | Relief | `relief-300` (altitude du niveau) | `data-above_m` |
+| Routes numérotées | `route-n1`, `route-d4a` (numéro) | `data-ref` (`N1`, `D4A`…), `data-kind` (`national`, `departmental`), `data-name` quand la route porte un nom |
+| Liaisons maritimes | `ferry-mamoudzou-dzaoudzi-barge` (nom) | `data-kind` (`ferry`), `data-name` |
+| Rues, chemins, sentiers | — (pas d'`id`) | `data-kind`, et `data-name`, `data-commune` (code INSEE) quand la voie a un nom |
 | Situation | `mayotte`, `mayotte-locator`, `country-mdg`… | — |
 
 Les noms sont les noms officiels du Code officiel géographique (par exemple « Bandrele », sans accent).
@@ -69,7 +75,7 @@ Pour que le CSS de la page s'applique, le SVG doit être **intégré dans le HTM
 
 Toutes les cartes de l'île partagent l'un de deux cadres, et se superposent au pixel près :
 
-- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography` ;
+- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, réseaux ;
 - **cadre lagon** : `mayotte-lagoon`, `lagoon`.
 
 Exemple : le relief sous les limites de communes, en empilant `relief.svg` puis `communes.svg` avec un remplissage transparent.
@@ -97,6 +103,30 @@ Pour n'afficher qu'un type de lieu :
 
 Les noms suivent l'orthographe de l'IGN. Un lieu absent de la BD TOPO n'apparaît pas : la carte reflète ce que l'IGN a recensé, pas tous les noms en usage.
 
+### Les routes et sentiers
+
+Les trois cartes de réseaux sont dessinées sur la silhouette de l'île. L'attribut `data-kind` donne la classe de chaque voie :
+
+| `data-kind` | Voies | Longueur |
+|---|---|---|
+| `national` | routes nationales N1 à N4, une forme par numéro | 89 km |
+| `departmental` | routes départementales (26 numéros, de D1 à D19 et DX) | 147 km |
+| `ferry` | liaisons maritimes : barge et amphidrome Mamoudzou – Dzaoudzi, départs vers Moroni et Mutsamudu | 17 km |
+| `secondary` | autres routes principales, non numérotées | 77 km |
+| `local` | routes et rues de desserte | 371 km |
+| `track` | chemins et routes empierrées | 593 km |
+| `trail` | sentiers (`trails.svg`) | 882 km |
+| `steps` | escaliers (`trails.svg`) | 30 km |
+
+`roads-main.svg` contient les classes `national`, `departmental` et `ferry` ; `roads-full.svg`, toutes les classes de routes. Les rues, chemins et sentiers sont regroupés par nom de voie et par commune (adresses BAN) : une voie nommée est une seule forme, les tronçons sans nom d'une classe en forment une autre. Seules les voies en service sont retenues. La seule route numérotée qui porte un nom sur toute sa longueur est la D9, « Route de Moya ».
+
+Pour n'afficher que les routes nationales :
+
+```css
+#roads path { display: none; }
+#roads path[data-kind="national"] { display: inline; }
+```
+
 ### Aucun texte dans les cartes
 
 Les SVG ne contiennent aucune étiquette : chacun ajoute les siennes, dans sa langue et sa police. Les noms sont dans les attributs `data-name`, et les centres des villages sont donnés par les cercles de `villages.svg`.
@@ -123,6 +153,7 @@ d3.select("svg").selectAll("path")
   - lagon : enveloppe convexe du système récifal, ramenée à 2,5 km au plus de tout récif ou de toute terre, puis lissée.
 - **Communes, cantons, intercommunalités, villages, cours d'eau, mangroves** : données IGN, simplifiées sans trou ni chevauchement entre voisins.
 - **Relief** : modèle numérique BD ALTI de l'IGN, au pas de 25 m.
+- **Routes et sentiers** : tronçons de route de la BD TOPO, classés par numéro, nature et importance, assemblés bout à bout et simplifiés à 10 m.
 
 ### Limites connues
 
@@ -130,6 +161,8 @@ d3.select("svg").selectAll("path")
 - Les zones de récif mêlent récif barrière, récif frangeant, herbiers et hauts-fonds : ce sont les zones peu profondes visibles depuis l'espace, pas une cartographie des habitats.
 - La côte des cartes administratives (IGN) et celle des silhouettes (Sentinel-2) diffèrent légèrement. Chaque famille reste cohérente avec elle-même.
 - Pas de courbes de profondeur du lagon dans cette version.
+- Les routes viennent de l'IGN et la côte de Sentinel-2 : en bord de mer, une route peut déborder de quelques mètres sur l'eau ou s'arrêter avant le rivage.
+- Les liaisons vers Moroni et Mutsamudu s'arrêtent à quelques kilomètres au nord de Dzaoudzi : la BD TOPO ne les trace que dans les eaux de Mayotte.
 
 ## Reconstruire les cartes
 
@@ -172,6 +205,8 @@ La Licence Ouverte de l'IGN suit ses données partout : nous ne pouvons pas leve
 | `villages.svg`, `places.svg` | `villages`, `places` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `hydrography.svg` | `rivers`, `mangroves` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `relief.svg` | `relief` | IGN – BD ALTI | « Source : IGN – BD ALTI » |
+| `roads-main.svg`, `roads-full.svg` | `roads` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
+| `trails.svg` | `trails`, `roads` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 
 `villages.svg` et `places.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
 
@@ -183,4 +218,4 @@ Auteur : Jean-Luc Petit.
 
 ## English summary
 
-Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, lagoon and reefs, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, rivers, mangroves and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.
+Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, lagoon and reefs, road network and footpaths, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, rivers, mangroves, roads, footpaths and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.

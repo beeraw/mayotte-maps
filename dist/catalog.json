@@ -78,6 +78,24 @@
     "bytes": 961896
   },
   {
+    "id": "network.roads-main",
+    "family": "network",
+    "path": "dist/svg/network/roads-main.svg",
+    "bytes": 101347
+  },
+  {
+    "id": "network.roads-full",
+    "family": "network",
+    "path": "dist/svg/network/roads-full.svg",
+    "bytes": 817305
+  },
+  {
+    "id": "network.trails",
+    "family": "network",
+    "path": "dist/svg/network/trails.svg",
+    "bytes": 721508
+  },
+  {
     "id": "situation.mozambique-channel",
     "family": "situation",
     "path": "dist/svg/situation/mozambique-channel.svg",
