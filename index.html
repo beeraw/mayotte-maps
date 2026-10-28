@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mayotte Maps</title>
+<link rel="icon" href="dist/svg/silhouette/mayotte-simple.svg">
+<style>
+  :root {
+    --bg: #f6f3ec;
+    --card: #ffffff;
+    --preview: #eef4f3;
+    --ink: #24302f;
+    --muted: #5f6b69;
+    --line: #dcd6c8;
+    --accent: #2b7a78;
+    --accent-ink: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141a1a;
+      --card: #1d2524;
+      --preview: #e9efee;
+      --ink: #e8ecea;
+      --muted: #a3afad;
+      --line: #2f3a39;
+      --accent: #6cc2bd;
+      --accent-ink: #102020;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141a1a;
+    --card: #1d2524;
+    --preview: #e9efee;
+    --ink: #e8ecea;
+    --muted: #a3afad;
+    --line: #2f3a39;
+    --accent: #6cc2bd;
+    --accent-ink: #102020;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 48px 0 24px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .lead { max-width: 62ch; margin: 0 0 8px; font-size: 1.1rem; }
+  .note { color: var(--muted); font-size: 0.9rem; margin: 4px 0; max-width: 80ch; }
+  .lang {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 0.9rem; cursor: pointer;
+  }
+  h2 { font-size: 1.3rem; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .card img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: contain; background: var(--preview); padding: 12px; }
+  .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .body h3 { margin: 0; font-size: 1rem; }
+  .body p { margin: 0; color: var(--muted); font-size: 0.9rem; flex: 1; }
+  .meta { font: 0.78rem ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); overflow-wrap: anywhere; }
+  .actions { display: flex; gap: 8px; margin-top: 6px; }
+  .actions a, .actions button {
+    flex: 1; text-align: center; font: inherit; font-size: 0.85rem; padding: 7px 8px; border-radius: 8px; cursor: pointer; text-decoration: none;
+  }
+  .actions a { background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); }
+  .actions button { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  footer { padding: 40px 0 48px; color: var(--muted); font-size: 0.85rem; }
+  @media (max-width: 560px) { header { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 data-i18n="page.title"></h1>
+      <p class="lead" data-i18n="page.lead"></p>
+      <p class="note" data-i18n="page.licence"></p>
+      <p class="note" data-i18n="page.overlay"></p>
+    </div>
+    <button class="lang" type="button" data-i18n="page.language"></button>
+  </header>
+  <main id="families"></main>
+  <footer><p data-i18n="page.sources"></p></footer>
+</div>
+<script>
+  const FAMILIES = ["silhouette", "administrative", "physical", "situation"];
+  let strings = {};
+  let locale = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "fr";
+
+  const t = (key, values = {}) =>
+    (strings[key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+
+  async function load() {
+    const [catalog, messages] = await Promise.all([
+      fetch("dist/catalog.json").then((response) => response.json()),
+      fetch(`i18n/${locale}.json`).then((response) => response.json()),
+    ]);
+    strings = messages;
+    document.documentElement.lang = locale;
+    document.title = t("page.title");
+    document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
+    render(catalog);
+  }
+
+  function render(catalog) {
+    const main = document.getElementById("families");
+    main.replaceChildren();
+    for (const family of FAMILIES) {
+      const section = document.createElement("section");
+      const title = document.createElement("h2");
+      title.textContent = t(`family.${family}`);
+      const grid = document.createElement("div");
+      grid.className = "grid";
+      for (const map of catalog.filter((entry) => entry.family === family)) {
+        grid.append(card(map));
+      }
+      section.append(title, grid);
+      main.append(section);
+    }
+  }
+
+  function card(map) {
+    const article = document.createElement("article");
+    article.className = "card";
+    const size = (map.bytes / 1024).toLocaleString(locale, { maximumFractionDigits: map.bytes < 10240 ? 1 : 0 });
+    article.innerHTML = `
+      <img alt="">
+      <div class="body">
+        <h3></h3>
+        <p></p>
+        <span class="meta"></span>
+        <div class="actions"><a download></a><button type="button"></button></div>
+      </div>`;
+    article.querySelector("img").src = map.path;
+    article.querySelector("img").alt = t(`map.${map.id}`);
+    article.querySelector("h3").textContent = t(`map.${map.id}`);
+    article.querySelector("p").textContent = t(`map.${map.id}.text`);
+    article.querySelector(".meta").textContent = `${map.path.split("/").pop()} · ${t("unit.kb", { size })}`;
+    const link = article.querySelector("a");
+    link.href = map.path;
+    link.textContent = t("action.download");
+    const button = article.querySelector("button");
+    button.textContent = t("action.copy");
+    button.addEventListener("click", async () => {
+      const code = await fetch(map.path).then((response) => response.text());
+      try {
+        await navigator.clipboard.writeText(code);
+        button.textContent = t("action.copied");
+        setTimeout(() => { button.textContent = t("action.copy"); }, 1600);
+      } catch {
+        window.open(map.path, "_blank");
+      }
+    });
+    return article;
+  }
+
+  document.querySelector(".lang").addEventListener("click", () => {
+    locale = locale === "fr" ? "en" : "fr";
+    const url = new URL(location.href);
+    url.searchParams.set("lang", locale);
+    history.replaceState(null, "", url);
+    load();
+  });
+
+  load();
+</script>
+</body>
+</html>

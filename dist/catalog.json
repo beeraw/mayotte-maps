@@ -1,0 +1,92 @@
+[
+  {
+    "id": "silhouette.mayotte",
+    "family": "silhouette",
+    "path": "dist/svg/silhouette/mayotte.svg",
+    "bytes": 34684
+  },
+  {
+    "id": "silhouette.mayotte-detailed",
+    "family": "silhouette",
+    "path": "dist/svg/silhouette/mayotte-detailed.svg",
+    "bytes": 143443
+  },
+  {
+    "id": "silhouette.mayotte-simple",
+    "family": "silhouette",
+    "path": "dist/svg/silhouette/mayotte-simple.svg",
+    "bytes": 5037
+  },
+  {
+    "id": "silhouette.mayotte-outline",
+    "family": "silhouette",
+    "path": "dist/svg/silhouette/mayotte-outline.svg",
+    "bytes": 34703
+  },
+  {
+    "id": "silhouette.mayotte-lagoon",
+    "family": "silhouette",
+    "path": "dist/svg/silhouette/mayotte-lagoon.svg",
+    "bytes": 237103
+  },
+  {
+    "id": "administrative.communes",
+    "family": "administrative",
+    "path": "dist/svg/administrative/communes.svg",
+    "bytes": 45194
+  },
+  {
+    "id": "administrative.cantons",
+    "family": "administrative",
+    "path": "dist/svg/administrative/cantons.svg",
+    "bytes": 44264
+  },
+  {
+    "id": "administrative.epci",
+    "family": "administrative",
+    "path": "dist/svg/administrative/epci.svg",
+    "bytes": 40973
+  },
+  {
+    "id": "administrative.villages",
+    "family": "administrative",
+    "path": "dist/svg/administrative/villages.svg",
+    "bytes": 58840
+  },
+  {
+    "id": "administrative.places",
+    "family": "administrative",
+    "path": "dist/svg/administrative/places.svg",
+    "bytes": 152949
+  },
+  {
+    "id": "physical.relief",
+    "family": "physical",
+    "path": "dist/svg/physical/relief.svg",
+    "bytes": 152059
+  },
+  {
+    "id": "physical.hydrography",
+    "family": "physical",
+    "path": "dist/svg/physical/hydrography.svg",
+    "bytes": 212273
+  },
+  {
+    "id": "physical.lagoon",
+    "family": "physical",
+    "path": "dist/svg/physical/lagoon.svg",
+    "bytes": 961896
+  },
+  {
+    "id": "situation.mozambique-channel",
+    "family": "situation",
+    "path": "dist/svg/situation/mozambique-channel.svg",
+    "bytes": 128614
+  },
+  {
+    "id": "situation.comoros-archipelago",
+    "family": "situation",
+    "path": "dist/svg/situation/comoros-archipelago.svg",
+    "bytes": 35987
+  }
+]
