@@ -104,5 +104,19 @@
   "kind.track": "Lane or track",
   "kind.trail": "Footpath",
   "kind.steps": "Steps",
-  "page.repository": "View the code on GitHub"
+  "page.repository": "View the code on GitHub",
+  "family.built": "Buildings and facilities",
+  "map.built.services": "Facilities and services",
+  "map.built.services.text": "935 named facilities: schools, health, town halls and public services, mosques, sport, squares, ports and the airport.",
+  "kind.education": "Education",
+  "kind.health": "Health and social care",
+  "kind.administration": "Administration and public services",
+  "kind.security": "Safety, defence and rescue",
+  "kind.worship": "Religious site",
+  "kind.public-space": "Square, park or garden",
+  "kind.culture": "Culture",
+  "kind.sport": "Sport",
+  "kind.tourism": "Tourism and leisure",
+  "kind.transport": "Transport",
+  "kind.economy": "Commerce, industry and utilities"
 }

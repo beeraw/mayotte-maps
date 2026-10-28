@@ -104,5 +104,19 @@
   "kind.track": "Chemin ou piste",
   "kind.trail": "Sentier",
   "kind.steps": "Escalier",
-  "page.repository": "Voir le code sur GitHub"
+  "page.repository": "Voir le code sur GitHub",
+  "family.built": "Bâti et équipements",
+  "map.built.services": "Équipements et services",
+  "map.built.services.text": "935 équipements nommés : écoles, santé, mairies et services publics, mosquées, sport, places, ports et aéroport.",
+  "kind.education": "Enseignement",
+  "kind.health": "Santé et action sociale",
+  "kind.administration": "Administration et services publics",
+  "kind.security": "Sécurité, défense et secours",
+  "kind.worship": "Lieu religieux",
+  "kind.public-space": "Place, parc ou jardin",
+  "kind.culture": "Culture",
+  "kind.sport": "Sport",
+  "kind.tourism": "Tourisme et loisirs",
+  "kind.transport": "Transport",
+  "kind.economy": "Commerce, industrie et réseaux"
 }
