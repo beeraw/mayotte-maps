@@ -123,12 +123,12 @@
     "id": "situation.mozambique-channel",
     "family": "situation",
     "path": "dist/svg/situation/mozambique-channel.svg",
-    "bytes": 128614
+    "bytes": 128613
   },
   {
     "id": "situation.comoros-archipelago",
     "family": "situation",
     "path": "dist/svg/situation/comoros-archipelago.svg",
-    "bytes": 35987
+    "bytes": 35986
   }
 ]
