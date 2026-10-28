@@ -48,9 +48,26 @@ const PLACE_STYLES = {
   reef: ["#2b7a78", 1.6],
 };
 
-function byKind(index) {
+// Facilities: colour and radius by category
+const SERVICE_STYLES = {
+  education: ["#2f6db5", 2.2],
+  health: ["#c4383b", 2.6],
+  administration: ["#6b4c9a", 2.4],
+  security: ["#34495e", 2.4],
+  worship: ["#2e8b57", 2.2],
+  "public-space": ["#8fb83f", 2.2],
+  culture: ["#c2569b", 2.4],
+  sport: ["#e08a1e", 2.2],
+  tourism: ["#17a2a2", 2.4],
+  transport: ["#1f1f1f", 3],
+  economy: ["#8b6b3d", 2.4],
+};
+
+const SERVICE_AREAS = { airport: "#d3cab8", runway: "#77716a", port: "#d3cab8" };
+
+function byKind(index, styles = PLACE_STYLES) {
   const value = (style) => (typeof style[index] === "string" ? `'${style[index]}'` : style[index]);
-  return Object.entries(PLACE_STYLES).map(([kind, style]) => `kind == '${kind}' ? ${value(style)}`).join(" : ");
+  return Object.entries(styles).map(([kind, style]) => `kind == '${kind}' ? ${value(style)}`).join(" : ");
 }
 
 const RELIEF_COLORS =["#dfe6c6", "#c9d8a6", "#b6c98e", "#c8b98a", "#b39c72", "#9a8060", "#86705a"];
@@ -116,6 +133,16 @@ async function administrative() {
   ], "svg-data=code,name,kind,commune");
 }
 
+async function built() {
+  const areas = Object.entries(SERVICE_AREAS).map(([area, color]) => `area == '${area}' ? '${color}'`).join(" : ");
+  await svg("built/services.svg", "island", [
+    `${layer("communes")} -simplify interval=20 keep-shapes ${idField("commune")} -style ${STYLE.division}`,
+    `${layer("services-areas")} -each 'svg_id = "service-area-" + area' -style fill="${areas} : 'none'" stroke=none`,
+    `${layer("services")} -each 'svg_id = "facility-" + slug' ` +
+      `-style fill="${byKind(0, SERVICE_STYLES)} : '#000'" r="${byKind(1, SERVICE_STYLES)} : 2" stroke='#ffffff' stroke-width=0.5`,
+  ], "svg-data=code,name,kind,commune");
+}
+
 async function physical() {
   const relief = RELIEF_COLORS.map((color, index) => `above_m == ${index * 100} ? '${color}'`).join(" : ");
   await svg("physical/relief.svg", "island", [
@@ -163,7 +190,7 @@ async function situation() {
 }
 
 async function geodata() {
-  const layers = ["land", "lagoon", "reef", "communes", "cantons", "epci", "villages", "places", "rivers", "mangroves", "relief"];
+  const layers = ["land", "lagoon", "reef", "communes", "cantons", "epci", "villages", "places", "rivers", "mangroves", "relief", "services"];
   for (const name of layers) {
     await mapshaper.runCommands(
       `${layer(name)} -simplify interval=5 keep-shapes -proj wgs84 -o ${dist}/geojson/mayotte-${name}.geojson precision=0.000001`,
@@ -182,6 +209,7 @@ const CATALOG_ORDER = {
   silhouette: ["mayotte", "mayotte-detailed", "mayotte-simple", "mayotte-outline", "mayotte-lagoon"],
   administrative: ["communes", "cantons", "epci", "villages", "places"],
   physical: ["relief", "hydrography", "lagoon"],
+  built: ["services"],
   situation: ["mozambique-channel", "comoros-archipelago"],
 };
 
@@ -199,12 +227,13 @@ async function catalog() {
 }
 
 await rm(dist, { recursive: true, force: true });
-for (const folder of ["svg/silhouette", "svg/administrative", "svg/physical", "svg/situation", "geojson", "topojson"]) {
+for (const folder of ["svg/silhouette", "svg/administrative", "svg/physical", "svg/built", "svg/situation", "geojson", "topojson"]) {
   await mkdir(`${dist}/${folder}`, { recursive: true });
 }
 await silhouettes();
 await administrative();
 await physical();
+await built();
 await situation();
 await geodata();
 await catalog();

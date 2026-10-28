@@ -23,6 +23,7 @@ Cartes vectorielles libres de Mayotte, prêtes à l'emploi : silhouettes, décou
 | Physique | `dist/svg/physical/relief.svg` | Relief en aplats de 100 m |
 | | `hydrography.svg` | Cours d'eau permanents et mangroves |
 | | `lagoon.svg` | Lagon, récifs et hauts-fonds, version détaillée |
+| Bâti et équipements | `dist/svg/built/services.svg` | 935 équipements nommés (écoles, santé, services publics, lieux de culte, sport, ports, aéroport…), sur le fond des communes |
 | Situation | `dist/svg/situation/mozambique-channel.svg` | Mayotte entre l'Afrique et Madagascar |
 | | `comoros-archipelago.svg` | Mayotte dans l'archipel des Comores |
 
@@ -30,7 +31,7 @@ La galerie `index.html` présente toutes les cartes, avec téléchargement et co
 
 Les mêmes couches existent en données géographiques, en WGS84 (longitude, latitude) :
 
-- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief` ;
+- `dist/geojson/mayotte-<couche>.geojson`, une couche par fichier : `land`, `lagoon`, `reef`, `communes`, `cantons`, `epci`, `villages`, `places`, `rivers`, `mangroves`, `relief`, `services` ;
 - `dist/topojson/mayotte.json`, toutes les couches dans un seul fichier léger.
 
 ## Utiliser les SVG
@@ -47,6 +48,7 @@ Chaque forme porte un `id` stable et des attributs `data-*` :
 | Villages | `village-97611-kaweni` (commune + nom) | `data-name`, `data-commune` |
 | Lieux nommés | `place-97611-kaweni`, `place-97611-hamaha-summit` pour un homonyme | `data-name`, `data-kind`, `data-commune` |
 | Relief | `relief-300` (altitude du niveau) | `data-above_m` |
+| Équipements | `facility-97611-college-de-kwale`, `facility-97604-mosquee-du-vendredi-worship-2` pour un homonyme | `data-name`, `data-kind`, `data-commune` |
 | Situation | `mayotte`, `mayotte-locator`, `country-mdg`… | — |
 
 Les noms sont les noms officiels du Code officiel géographique (par exemple « Bandrele », sans accent).
@@ -69,7 +71,7 @@ Pour que le CSS de la page s'applique, le SVG doit être **intégré dans le HTM
 
 Toutes les cartes de l'île partagent l'un de deux cadres, et se superposent au pixel près :
 
-- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography` ;
+- **cadre île** : silhouettes (sauf `mayotte-lagoon`), administratif, `relief`, `hydrography`, `services` ;
 - **cadre lagon** : `mayotte-lagoon`, `lagoon`.
 
 Exemple : le relief sous les limites de communes, en empilant `relief.svg` puis `communes.svg` avec un remplissage transparent.
@@ -96,6 +98,26 @@ Pour n'afficher qu'un type de lieu :
 ```
 
 Les noms suivent l'orthographe de l'IGN. Un lieu absent de la BD TOPO n'apparaît pas : la carte reflète ce que l'IGN a recensé, pas tous les noms en usage.
+
+### Les équipements
+
+`services.svg` place un point sur chaque équipement nommé de la BD TOPO (zones d'activité ou d'intérêt, ports, gares maritimes et routières, aéroport). L'emprise de l'aéroport, sa piste et le port de Longoni sont dessinés en aplat sous les points (`service-area-airport`, `service-area-runway`, `service-area-port`). L'attribut `data-kind` donne la catégorie :
+
+| `data-kind` | Équipements | Nombre |
+|---|---|---|
+| `education` | écoles, collèges, lycées, université, centres de formation | 361 |
+| `health` | hôpitaux, centres de consultation, PMI, accueil des personnes handicapées | 28 |
+| `administration` | mairies, préfecture, services de l'État et du Département, poste, France services… | 128 |
+| `security` | gendarmerie, police, pompiers, casernes, prison | 25 |
+| `worship` | mosquées, églises, tombeaux | 97 |
+| `public-space` | places, parcs et jardins | 74 |
+| `culture` | bibliothèques, musées, salles de spectacle, vestiges | 38 |
+| `sport` | stades, terrains, gymnases, piscines, sports nautiques | 101 |
+| `tourism` | offices de tourisme, farés et aires de repos, hébergements de loisirs | 19 |
+| `transport` | aéroport, ports, gares maritimes et routière, parking relais | 18 |
+| `economy` | marchés, zones industrielles, centrales, déchèteries, eau potable, épuration | 46 |
+
+Les équipements « en projet » sont écartés, ceux « en construction » sont gardés. Comme pour les lieux nommés, la carte reflète ce que l'IGN a recensé et nommé.
 
 ### Aucun texte dans les cartes
 
@@ -172,8 +194,9 @@ La Licence Ouverte de l'IGN suit ses données partout : nous ne pouvons pas leve
 | `villages.svg`, `places.svg` | `villages`, `places` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `hydrography.svg` | `rivers`, `mangroves` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 | `relief.svg` | `relief` | IGN – BD ALTI | « Source : IGN – BD ALTI » |
+| `services.svg` | `services` | IGN – BD TOPO | « Source : IGN – BD TOPO » |
 
-`villages.svg` et `places.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
+`villages.svg`, `places.svg` et `services.svg` reprennent aussi le fond des communes : leur mention couvre donc Admin Express et BD TOPO (« Source : IGN – Admin Express, BD TOPO »). Le TopoJSON regroupe toutes les couches et demande la mention de l'IGN.
 
 Pour les cartes libres de toute mention, une ligne « Contient des données Copernicus Sentinel-2 modifiées » reste bienvenue, sans être imposée à ceux qui reprennent nos cartes.
 
@@ -183,4 +206,4 @@ Auteur : Jean-Luc Petit.
 
 ## English summary
 
-Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, lagoon and reefs, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, rivers, mangroves and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.
+Free vector maps of Mayotte: outlines, administrative divisions (communes, cantons, EPCI, villages), relief, rivers and mangroves, lagoon and reefs, facilities and services, and locator maps. SVG files carry stable ids and `data-*` attributes and no text labels; GeoJSON and TopoJSON are in WGS84. Island maps share common frames and overlay exactly. Coastline, reefs and lagoon were traced from Sentinel-2 imagery and carry no conditions, like the locator maps. Administrative divisions, villages, named places, facilities, rivers, mangroves and relief come from IGN data under the Licence Ouverte: reusing them requires the credit “Source: IGN”. Maps are released under CC0 1.0, subject to that credit; code under MIT-0.
