@@ -86,5 +86,6 @@
   "kind.isthmus": "Isthmus",
   "kind.islet": "Islet",
   "kind.cape": "Cape",
-  "kind.reef": "Reef"
+  "kind.reef": "Reef",
+  "page.repository": "View the code on GitHub"
 }

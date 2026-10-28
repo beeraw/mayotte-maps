@@ -104,6 +104,16 @@
   .lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); cursor: default; }
   .lang button:not([aria-pressed="true"]):hover { color: var(--ink); }
 
+  /* Link to the source repository, same height as the language switch */
+  .top-actions { display: inline-flex; align-items: center; gap: 10px; }
+  .repo {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); color: var(--ink); transition: background 0.15s, color 0.15s;
+  }
+  .repo svg { width: 20px; height: 20px; }
+  .repo:hover { background: var(--ink); color: var(--paper); }
+
   /* Hero: the communes map itself, live */
   .hero { display: grid; gap: 32px; padding-top: 16px; padding-bottom: 56px; align-items: center; }
   @media (min-width: 900px) { .hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 64px; padding-top: 32px; padding-bottom: 88px; } }
@@ -265,9 +275,14 @@
 <body>
 <div class="wrap top">
   <a class="brand" href="#top" id="top"><span class="glyph" aria-hidden="true"></span><span data-i18n="page.brand"></span></a>
-  <div class="lang" role="group" data-i18n-label="page.language">
-    <button type="button" data-lang="fr" lang="fr"><span aria-hidden="true" data-i18n="lang.fr"></span><span class="visually-hidden" data-i18n="lang.fr.name"></span></button>
-    <button type="button" data-lang="en" lang="en"><span aria-hidden="true" data-i18n="lang.en"></span><span class="visually-hidden" data-i18n="lang.en.name"></span></button>
+  <div class="top-actions">
+    <div class="lang" role="group" data-i18n-label="page.language">
+      <button type="button" data-lang="fr" lang="fr"><span aria-hidden="true" data-i18n="lang.fr"></span><span class="visually-hidden" data-i18n="lang.fr.name"></span></button>
+      <button type="button" data-lang="en" lang="en"><span aria-hidden="true" data-i18n="lang.en"></span><span class="visually-hidden" data-i18n="lang.en.name"></span></button>
+    </div>
+    <a class="repo" href="https://github.com/beeraw/mayotte-maps" data-i18n-label="page.repository" data-i18n-title="page.repository">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
   </div>
 </div>
 
@@ -627,6 +642,7 @@
     document.title = t("page.title");
     document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
     document.querySelectorAll("[data-i18n-label]").forEach((node) => { node.setAttribute("aria-label", t(node.dataset.i18nLabel)); });
+    document.querySelectorAll("[data-i18n-title]").forEach((node) => { node.title = t(node.dataset.i18nTitle); });
     document.querySelectorAll(".lang button").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.lang === locale));
     });
