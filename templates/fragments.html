@@ -1,0 +1,55 @@
+<template id="tile">
+<li class="tile" data-family="{{id}}">
+      <a href="{{href}}" data-nav>
+        <span class="tile-preview"><img src="{{src}}" data-i18n-alt="map.{{cover}}" alt="" loading="lazy" decoding="async"></span>
+        <h3 data-i18n="family.{{id}}"></h3>
+        <p data-i18n="family.{{id}}.text"></p>
+        <span class="count" data-count="{{n}}"></span>
+      </a>
+    </li>
+</template>
+
+<template id="index-item">
+<li><a href="{{href}}" data-nav><span data-i18n="family.{{id}}"></span><span data-count="{{n}}"></span></a></li>
+</template>
+
+<template id="chip">
+<li><a class="chip{{class}}" href="{{href}}" data-nav{{current}}><span data-i18n="family.{{id}}"></span>{{badge}}</a></li>
+</template>
+
+<template id="chip-count">
+<span>{{n}}</span>
+</template>
+
+<template id="chip-soon">
+<span data-i18n="section.soon"></span>
+</template>
+
+<template id="count">
+<p data-count="{{n}}"></p>
+</template>
+
+<template id="grid">
+<div class="grid">{{cards}}</div>
+</template>
+
+<template id="empty">
+<p class="empty" data-i18n="section.empty"></p>
+</template>
+
+<template id="card">
+<article class="card" data-id="{{id}}" data-path="{{path}}" data-bytes="{{bytes}}">
+        <button class="preview" type="button" data-i18n-label="action.open" data-i18n-vars="name:map.{{id}}">
+          <img src="{{src}}" data-i18n-alt="map.{{id}}" alt="" loading="lazy" decoding="async">
+          <span class="lens" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg></span>
+        </button>
+        <h3 data-i18n="map.{{id}}"></h3>
+        <p data-i18n="map.{{id}}.text"></p>
+        <div class="file"><span>{{file}}</span><span data-filesize="{{bytes}}"></span></div>
+        <div class="actions"><a class="btn btn-primary" href="{{src}}" download data-i18n="action.download"></a><button class="btn" type="button" data-copy data-i18n="action.copy"></button></div>
+      </article>
+</template>
+
+<template id="credit">
+{{before}}<a href="https://beeraw.yt">{{author}}</a>{{after}}
+</template>

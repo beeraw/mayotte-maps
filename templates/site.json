@@ -1,0 +1,12 @@
+{
+  "url": "https://beeraw.github.io/mayotte-maps/",
+  "hero": "administrative.communes",
+  "sections": [
+    { "id": "silhouette" },
+    { "id": "administrative", "cover": "administrative.villages" },
+    { "id": "physical" },
+    { "id": "network" },
+    { "id": "built" },
+    { "id": "situation", "cover": "situation.comoros-archipelago" }
+  ]
+}

@@ -151,5 +151,15 @@
   "kind.agricultural": "Farm buildings",
   "kind.religious": "Places of worship",
   "kind.sports": "Sports facilities",
-  "kind.other": "Outbuildings and unclassified"
+  "kind.other": "Outbuildings and unclassified",
+  "family.silhouette.text": "The shape of the island, from the detailed outline to the icon, with or without the lagoon.",
+  "family.administrative.text": "Communes, cantons, intercommunalities, villages and named places, with their official codes.",
+  "family.physical.text": "Relief, rivers, mangroves, lagoon and reefs.",
+  "family.network.text": "Main roads, the full road network and trails.",
+  "family.built.text": "The island's buildings and main facilities.",
+  "family.situation.text": "Mayotte in the Comoros archipelago and in the Mozambique Channel.",
+  "section.meta.title": "{name} · Maps of Mayotte",
+  "section.meta.description": "{text} Free vector maps of Mayotte to download or copy as SVG.",
+  "section.soon": "soon",
+  "section.empty": "These maps are in preparation."
 }

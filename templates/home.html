@@ -1,0 +1,21 @@
+<header class="wrap hero">
+  <div>
+    <h1 data-i18n="page.title"></h1>
+    <p class="lead" data-i18n="page.lead"></p>
+    <p class="note" data-i18n="page.licence"></p>
+    <p class="note" data-i18n="page.overlay"></p>
+    <nav data-i18n-label="page.index"><ul class="index">{{index}}</ul></nav>
+  </div>
+  <figure class="hero-map">
+    <div class="stage" id="hero-stage" data-id="{{hero_id}}" data-path="{{hero_path}}">
+      <div class="holder" id="hero-holder"></div>
+      <div class="tip" hidden aria-hidden="true"></div>
+    </div>
+    <figcaption id="hero-hint" data-i18n="page.hero.hint.mouse"></figcaption>
+  </figure>
+</header>
+
+<main class="wrap tiles" aria-labelledby="tiles-title">
+  <h2 class="visually-hidden" id="tiles-title" data-i18n="page.index"></h2>
+  <ul class="tile-grid">{{tiles}}</ul>
+</main>
